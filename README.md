@@ -21,15 +21,16 @@ evaluation metrics: performance, creativity, elegance, rigor, plausibility
 
 > Internal deadline: November 16, 2020
 
-- Here we want to get a working baseline and try out two or more learning algorithms
-
+- Here we want to get a working baseline and try out $n$ or more learning algorithms
+- Choose the one we like the most / is most feasible?
+- ...
 
 ### Phase 2. Add biological plausibility 🧠
 
 > Internal deadline: November 23, 2020
 
 - Can be at the level of learning, network architecture, neuron model, exploration strategy etc.
-- Use the lectures, podcasts for inspiration to come up with a good addition
+- Use the lectures, podcasts, papers for inspiration to come up with a good addition 
 - Make sure it is actually plausible (i.e. based on how the brain works)
 
 ### Phase 3. Wrapping up and write report 📋
@@ -43,5 +44,9 @@ evaluation metrics: performance, creativity, elegance, rigor, plausibility
 ### Other details
 
 - We collaborate through github
+- Meet: **Thursdays** 8.30 - 10.30 , **Fridays** 15:30-18:00
 - Divide and conquer, work in teams of 2??
 
+### Links to used papers
+
+[]()
