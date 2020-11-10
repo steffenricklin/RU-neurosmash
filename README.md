@@ -17,7 +17,7 @@ evaluation metrics: performance, creativity, elegance, rigor, plausibility
 
 ## TODO's
 
-### Phase 1. Implement this replicate world model findings 🧩
+### Phase 1. Implement world models and replicate world model findings 🧩
 
 > Internal deadline: November 20, 2020
 
