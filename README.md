@@ -1,6 +1,7 @@
 # RU-neurosmash
 
 Team: Stijn, Steffen, Ron, Daphne, David
+
 Overleaf project link: https://www.overleaf.com/4876892577srsncyqdtxdw
 
 ## Assignment 
