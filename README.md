@@ -37,7 +37,7 @@ We ideally would like to have
 
 ### Phase 2. Add biological plausibility 🧠
 
-> Internal deadline: November 23, 2020
+> Internal deadline: November 26, 2020
 
 - Can be at the level of learning, network architecture, neuron model, exploration strategy etc.
 - Use the lectures, podcasts, papers for inspiration to come up with a good addition 
@@ -45,7 +45,7 @@ We ideally would like to have
 
 ### Phase 3. Wrapping up and write report 📋
 
-> Internal deadline: November 30, 2020
+> Internal deadline: December 2, 2020
 
 - Fix bugs, make sure everything works smoothly (rigor)
 - Make sure code & documentation is on point (elegance)
