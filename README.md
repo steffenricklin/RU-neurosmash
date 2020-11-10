@@ -23,7 +23,7 @@ evaluation metrics: performance, creativity, elegance, rigor, plausibility
 
 We will do something with the world models.
 
-[github](https://worldmodels.github.io/) [arxiv](https://arxiv.org/pdf/1803.10122.pdf)
+[[github](https://worldmodels.github.io/)] [[arxiv](https://arxiv.org/pdf/1803.10122.pdf)]
 
 This has 3 main components
 
