@@ -17,13 +17,23 @@ evaluation metrics: performance, creativity, elegance, rigor, plausibility
 
 ## TODO's
 
-### Phase 1. Working baseline and choose learning algorithm 🧩
+### Phase 1. Implement this replicate world model findings 🧩
 
-> Internal deadline: November 16, 2020
+> Internal deadline: November 20, 2020
 
-- Here we want to get a working baseline and try out $n$ or more learning algorithms
-- Choose the one we like the most / is most feasible?
-- ...
+We will do something with the world models.
+
+[github](https://worldmodels.github.io/) [arxiv](https://arxiv.org/pdf/1803.10122.pdf)
+
+This has 3 main components
+
+- Autoencoder (Ron, Steffen)
+- RNN & Controller (Daphne, Stijn, David)
+
+We ideally would like to have 
+- Paper read 
+- Get a working baseline, all of the above components
+
 
 ### Phase 2. Add biological plausibility 🧠
 
