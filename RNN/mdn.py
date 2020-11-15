@@ -1,27 +1,21 @@
-import mxnet as mx
-from mxnet import nd, autograd
-from mxnet import autograd, gluon, nd, init 
-from mxnet.gluon import nn, Block
+from mxnet import nd
+from mxnet.gluon import nn
 from mxnet.gluon.nn import LeakyReLU
 
 from gluonts.mx.distribution.gaussian import Gaussian
 from gluonts.mx.distribution.mixture import MixtureDistribution
-
-
-import tqdm
-
 
 class MDN(nn.Block):
     def __init__(self, x_dim, n_components, t_dim):
         """
         Initialization of MDN model
         The methods follow closely those in 'Mixture Density Networks', Bishop, 1994
-
         """
+
         # Parameter initialization
         self.x_dim = x_dim
-        self.n_components = n_components
-        self.t_dim = t_dim  # Also referred to as c in Bishop
+        self.n_components = n_components    # Also referred to as m in Bishop
+        self.t_dim = t_dim                  # Also referred to as c in Bishop
         self.z_dim = (self.t_dim + 2)*self.n_components
         self.latent_1_dim = 2*self.x_dim
         self.latent_2_dim = self.x_dim + self.z_dim
@@ -31,7 +25,7 @@ class MDN(nn.Block):
         self.linear_1 = nn.Dense(self.latent_1_dim, activation = LeakyReLU, use_bias=True)
         self.linear_2 = nn.Dense(self.latent_2_dim, activation = LeakyReLU, use_bias=True)
         self.linear_3 = nn.Dense(self.latent_3_dim, activation = LeakyReLU, use_bias=True)
-        self.linear_4 = nn.Dense(self.z_dim, use_bias=True) # Final layer is purely linear
+        self.linear_4 = nn.Dense(self.z_dim, use_bias=True) # Final layer is purely linear to give flexibility in mu. Positivity of variance and mixture components is ensured by exponentiation
         
     def forward(self, X):
         # Perform neural network pass

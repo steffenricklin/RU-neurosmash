@@ -1,13 +1,4 @@
-import mxnet as mx
-from mxnet import nd, autograd
-from mxnet import autograd, gluon, nd, init 
-from mxnet.gluon import nn, Block
-from mxnet.gluon.nn import LeakyReLU
-
-from gluonts.distribution import Gaussian
-from gluonts.distribution import MixtureDistribution
-
-import tqdm
+from mxnet.gluon import nn
 
 from settings import *
 from RNN.lstm import *
@@ -21,7 +12,7 @@ class MDN_RNN(nn.Block):
         
         :param z_dim (int) Input dimensions, latent vector of VAE  
         :param interface_dim (int) Width of connection between RNN and MDD
-        :param n_components (int) The number of ditributions modeled by the MDD
+        :param n_components (int) The number of distributions modeled by the MDD
 
         return: MDN RNN object
         """
