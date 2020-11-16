@@ -32,7 +32,7 @@ class LSTM(nn.Block):
 
         # Weight initialization 
         # Only the output dim is specified, the input dim will be inferred at first use
-        # Since the outputs of these matrices will always be summed, only one a bias term
+        # Since the outputs of these matrices will always be summed, only one of every (W,U) needs a bias term
         self.W_f = nn.Dense(self.f_dim, use_bias=True)
         self.U_f = nn.Dense(self.f_dim, use_bias=False)
 
@@ -53,7 +53,7 @@ class LSTM(nn.Block):
         f_t = (self.W_f@X + self.U_f@self.h).sigmoid()
         i_t = (self.W_i@X + self.U_i@self.h).sigmoid()
         o_t = (self.W_o@X + self.U_o@self.h).sigmoid()
-        c_tilde_t = (self.W_c@X + self.U_x@self.h).sigmoid()
+        c_tilde_t = (self.W_c@X + self.U_c@self.h).sigmoid()
         self.c = nd.multiply(f_t, self.c) + nd.multiply(i_t , c_tilde_t)
         self.h = nd.multiply(o_t, self.c.sigmoid())
         return self.h

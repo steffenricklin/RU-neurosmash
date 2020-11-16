@@ -1,8 +1,8 @@
 from mxnet.gluon import nn
 
 from settings import *
-from RNN.lstm import *
-from RNN.mdn import *
+from MDN_RNN.lstm import *
+from MDN_RNN.mdn import *
 
 class MDN_RNN(nn.Block):
     
