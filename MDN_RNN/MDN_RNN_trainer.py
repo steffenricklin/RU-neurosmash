@@ -45,7 +45,7 @@ class MDN_RNN_trainer:
         [n_episodes, n_timesteps_per_episode,z_dim] = Z.shape
         [_,_,a_dim] = A.shape
 
-        negative_log_probabilities = nd.array(A.shape[:2])
+        negative_log_probabilities = nd.array([n_epochs]+A.shape[:2])
 
         for epo in range(n_epochs):
             #TODO implement sampling tactic explained in 'World Models', last paragraph of section A.2, to avoid overfitting
@@ -65,7 +65,7 @@ class MDN_RNN_trainer:
 
                         negative_log_probabilities.backward()
 
-                        negative_log_probabilities[epi,t] = negative_log_probability
+                        negative_log_probabilities[epo,epi,t] = negative_log_probability
 
 
 
