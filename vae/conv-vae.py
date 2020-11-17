@@ -33,31 +33,36 @@ class ConvVae(gluon.HybridBlock):
         # Input has the shape size x size x 3
         encoder = nn.HybridSequential(prefix='encoder')
         # relu conv 32 x 4
-        encoder.add(nn.Conv2D(32*4, strides=2, activation='relu'))
+        encoder.add(nn.Conv2D(channels=32*4, strides=2, activation='relu'))
         # relu conv 64 x 4
-        encoder.add(nn.Conv2D(64*4, strides=2, activation='relu'))
+        encoder.add(nn.Conv2D(channels=64*4, strides=2, activation='relu'))
         # relu conv 128 x 4
-        encoder.add(nn.Conv2D(128*4, strides=2, activation='relu'))
+        encoder.add(nn.Conv2D(channels=128*4, strides=2, activation='relu'))
         # relu conv 256 x 4
-        encoder.add(nn.Conv2D(256*4, strides=2, activation='relu'))
+        encoder.add(nn.Conv2D(channels=256*4, strides=2, activation='relu'))
 
         return encoder
         
-    def get_vae():
-        
-        pass
+    def get_vae(self, F, h):
+        # Get mu and log-variance
+        self.mu, self.lv = F.split(h, axis=1, num_outputs=2)
+        # Calculate epsilon
+        eps = F.random_normal(loc=0, scale=1, shape=(self.batch_size, self.n_latent), ctx=model_ctx)
+        # Calculate z
+        z = mu + F.exp(0.5*lv) * eps
+        return z
 
     def getDecoder(self):
         # shape of z should be already reshape from (1024x1x1)  to 1x1x1024
         decoder = nn.HybridSequential(prefix='decoder')
         # relu deconv 128x5 to 5x5x128
-        decoder.add(nn.Conv2DTranspose(128*5, strides=2, activation='relu'))
+        decoder.add(nn.Conv2DTranspose(channels=128*5, strides=2, activation='relu'))
         # relu deconv 64x5 to 13x13x64
-        decoder.add(nn.Conv2DTranspose(64*5, strides=2, activation='relu'))
+        decoder.add(nn.Conv2DTranspose(channels=64*5, strides=2, activation='relu'))
         # relu deconv 32x6 to 30x30x32
-        decoder.add(nn.Conv2DTranspose(32*6, strides=2, activation='relu'))
+        decoder.add(nn.Conv2DTranspose(channels=32*6, strides=2, activation='relu'))
         # sigmoid deconv 3x6 to 64x64x3
-        decoder.add(nn.Conv2DTranspose(128*5, strides=2, activation='sigmoid'))
+        decoder.add(nn.Conv2DTranspose(channels=128*5, strides=2, activation='sigmoid'))
 
         return decoder
 
@@ -65,10 +70,21 @@ class ConvVae(gluon.HybridBlock):
         h = self.encoder(x)
 
         # generate z from h
-        z = self.get_vae(h)
+        z = self.get_vae(F, h)
 
         if not train:
             return z  # return z
-        else: # reconstruct
+        else:  # reconstruct
             z = z.reshape((1, 1, 1024))
-            recon = self.decoder(z)
+            reconstruction = self.decoder(z)
+
+            self.output = reconstruction
+
+            mu = self.mu
+            lv = self.lv
+            # Kullback-Leibler
+            KL = 0.5 * F.sum(1 + lv - mu * mu - F.exp(lv), axis=1)
+
+            logloss = F.sum(x*F.log(y+self.soft_zero)+ (1-x)*F.log(1-y+self.soft_zero), axis=1)
+            loss = -logloss-KL
+            return loss
