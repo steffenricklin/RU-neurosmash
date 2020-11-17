@@ -4,9 +4,11 @@ from settings import *
 from MDN_RNN.lstm import *
 from MDN_RNN.mdn import *
 
-class MDN_RNN(nn.Block):
+class mdn_rnn(nn.Block):
     
     def __init__(self, z_dim=z_dim, interface_dim=10, n_components=2):
+        super(mdn_rnn, self).__init__()        
+
         """
         Initialization Mixture Density Network - RNN model.
         
@@ -22,9 +24,9 @@ class MDN_RNN(nn.Block):
         self.interface_dim = interface_dim
         self.n_components = n_components
 
-        # Initialize RNN and MDD
+        # Initialize RNN and MDN
         self.RNN = LSTM(self.z_dim, self.n_components)
-        self.MDN = MDN(self.interface_dim,  self.n_components)
+        self.MDN = MDN(self.interface_dim,  self.n_components, self.z_dim)
 
 
     def forward(self, x):

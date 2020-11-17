@@ -7,6 +7,7 @@ from gluonts.mx.distribution.mixture import MixtureDistribution
 
 class MDN(nn.Block):
     def __init__(self, x_dim, n_components, t_dim):
+        super(MDN, self).__init__()        
         """
         Initialization of MDN model
         The methods follow closely those in 'Mixture Density Networks', Bishop, 1994
@@ -22,10 +23,12 @@ class MDN(nn.Block):
         self.latent_3_dim = 2 * self.z_dim
 
         # Weights initialization
-        self.linear_1 = nn.Dense(self.latent_1_dim, activation = LeakyReLU, use_bias=True)
-        self.linear_2 = nn.Dense(self.latent_2_dim, activation = LeakyReLU, use_bias=True)
-        self.linear_3 = nn.Dense(self.latent_3_dim, activation = LeakyReLU, use_bias=True)
-        self.linear_4 = nn.Dense(self.z_dim, use_bias=True) # Final layer is purely linear to give flexibility in mu. Positivity of variance and mixture components is ensured by exponentiation
+        with self.name_scope():
+
+            self.linear_1 = nn.Dense(self.latent_1_dim, activation = "LeakyReLU", use_bias=True)
+            self.linear_2 = nn.Dense(self.latent_2_dim, activation = "LeakyReLU", use_bias=True)
+            self.linear_3 = nn.Dense(self.latent_3_dim, activation = "LeakyReLU", use_bias=True)
+            self.linear_4 = nn.Dense(self.z_dim, use_bias=True) # Final layer is purely linear to give flexibility in mu. Positivity of variance and mixture components is ensured by exponentiation
         
     def forward(self, X):
         # Perform neural network pass

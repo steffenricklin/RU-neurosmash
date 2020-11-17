@@ -1,4 +1,4 @@
-z_dim = 32
-h_dim = 16
-
+z_dim = 10
+h_dim = 10
+move_dim = 2
 

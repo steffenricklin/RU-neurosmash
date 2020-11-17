@@ -2,7 +2,8 @@ from mxnet import nd
 from mxnet.gluon import nn
 
 class LSTM(nn.Block):
-    def __init__(self, x_dim, h_dim, c_dim = 5, f_dim = 5, o_dim = 5):
+    def __init__(self, x_dim, h_dim, c_dim = 5, i_dim=5, f_dim = 5, o_dim = 5):
+        super(LSTM, self).__init__()        
         """
         Initialization LSTM model.
 
@@ -21,7 +22,8 @@ class LSTM(nn.Block):
         self.c_dim = c_dim
         self.f_dim = f_dim
         self.o_dim = o_dim
-
+        self.i_dim = i_dim
+        
         # Surrogate output for first use
         self.h_0 = nd.zeros(self.h_dim)
         self.h = self.h_0
@@ -33,17 +35,19 @@ class LSTM(nn.Block):
         # Weight initialization 
         # Only the output dim is specified, the input dim will be inferred at first use
         # Since the outputs of these matrices will always be summed, only one of every (W,U) needs a bias term
-        self.W_f = nn.Dense(self.f_dim, use_bias=True)
-        self.U_f = nn.Dense(self.f_dim, use_bias=False)
+        with self.name_scope():
 
-        self.W_i = nn.Dense(self.i_dim, use_bias=True)
-        self.U_i = nn.Dense(self.i_dim, use_bias=False)
-        
-        self.W_o = nn.Dense(self.o_dim, use_bias=True)
-        self.U_o = nn.Dense(self.o_dim, use_bias=False)
+            self.W_f = nn.Dense(self.f_dim, use_bias=True)
+            self.U_f = nn.Dense(self.f_dim, use_bias=False)
 
-        self.W_c = nn.Dense(self.c_dim, use_bias=True)
-        self.U_c = nn.Dense(self.c_dim, use_bias=False)
+            self.W_i = nn.Dense(self.i_dim, use_bias=True)
+            self.U_i = nn.Dense(self.i_dim, use_bias=False)
+            
+            self.W_o = nn.Dense(self.o_dim, use_bias=True)
+            self.U_o = nn.Dense(self.o_dim, use_bias=False)
+
+            self.W_c = nn.Dense(self.c_dim, use_bias=True)
+            self.U_c = nn.Dense(self.c_dim, use_bias=False)
 
 
     def forward(self, X):

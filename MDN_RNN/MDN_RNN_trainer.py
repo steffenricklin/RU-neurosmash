@@ -3,13 +3,12 @@ import mxnet as mx
 from mxnet import autograd
 from mxnet.gluon import nn
 from mxnet import nd, gluon, optimizer
-from MDN_RNN import mdn_rnn
+from MDN_RNN.mdn_rnn import * 
 
 class MDN_RNN_trainer:
     """
     An object to train and evaluate an MDD-RNN model
     """
-
 
     def __init__(self):
         pass
@@ -36,14 +35,14 @@ class MDN_RNN_trainer:
         negative_log_likelihoods: (nd.array(float)) the training losses
         """
         optim = optimizer.Adam(learning_rate = lr)
+
         trainer = gluon.Trainer(model.collect_params(), optim)
         Z = data[0]
         A = data[1]
 
         assert Z.shape[:2] == A.shape[:2], "Hidden states and actions do not have the same number of episodes or timesteps"
 
-        [n_episodes, n_timesteps_per_episode,z_dim] = Z.shape
-        [_,_,a_dim] = A.shape
+        [n_episodes, n_timesteps_per_episode,_] = Z.shape
 
         negative_log_probabilities = nd.array([n_epochs]+A.shape[:2])
 
@@ -62,35 +61,9 @@ class MDN_RNN_trainer:
                         y = model(za_t)
 
                         negative_log_probability = -y.log_prob(z_tplusone)
-
-                        negative_log_probabilities.backward()
-
                         negative_log_probabilities[epo,epi,t] = negative_log_probability
+                
+                negative_log_probabilities[epo, epi].backward()
+                trainer.step(1)
 
-
-
-
-
-
-                    
-
-            
-
-
-
-
-
-            # z_t = 
-            pass
-
-            
-
-
-
-
-
-
-
-
-
-        pass
+        return negative_log_probabilities
