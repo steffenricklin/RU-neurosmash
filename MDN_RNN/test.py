@@ -18,9 +18,9 @@ print(data_from_VAE)
 print(move_one_hot)
 
 model = mdn_rnn(z_dim = z_dim + move_dim)
-model.initialize(mx.init.Xavier())
+model.initialize("xavier")
 
-trainer = MDN_RNN_trainer()
+trainer = MDN_RNN_trainer(0.001,1,5)
 
 trainer.train(model,(data_from_VAE,move_one_hot) )
 

@@ -35,13 +35,15 @@ class mdn_rnn(nn.Block):
         
         :param x (Numpy array) Concatenated array of h-1, z-1 and a-1
 
-        return: mixture of densities representing p( x_t+1 | x_t )
-
+        return: 
+            p_t_X - gluonts.mx.Mixture: mixture of densities representing p( x_t+1 | x_t )
+            z - nd.array(float): output state of the RNN
+            c - nd.array(float): hidden state of the RNN
         #TODO perform gradient descent on:  - log( p( x_t+1 | x ))
         """
-        z = self.RNN(x)
+        z, c = self.RNN(x)
         p_t_X = self.MDN(z)
-        return p_t_X
+        return p_t_X, z, c
 
     def reset_state(self):
         self.RNN.reset_state()

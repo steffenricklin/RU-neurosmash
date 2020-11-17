@@ -60,7 +60,7 @@ class LSTM(nn.Block):
         c_tilde_t = (self.W_c@X + self.U_c@self.h).sigmoid()
         self.c = nd.multiply(f_t, self.c) + nd.multiply(i_t , c_tilde_t)
         self.h = nd.multiply(o_t, self.c.sigmoid())
-        return self.h
+        return self.h, self.c
 
     def reset_state(self):
         """
