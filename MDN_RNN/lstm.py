@@ -58,4 +58,10 @@ class LSTM(nn.Block):
         self.h = nd.multiply(o_t, self.c.sigmoid())
         return self.h
 
+    def reset_state(self):
+        """
+        This method resets the state to s_0, so that a new sequence can be started. 
+        """
+        self.h = self.h_0
+        self.c = self.c_0
 

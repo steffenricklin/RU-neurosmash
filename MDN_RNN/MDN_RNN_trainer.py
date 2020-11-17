@@ -1,4 +1,6 @@
+from operator import neg
 import mxnet as mx
+from mxnet import autograd
 from mxnet.gluon import nn
 from mxnet import nd, gluon, optimizer
 from MDN_RNN import mdn_rnn
@@ -31,7 +33,7 @@ class MDN_RNN_trainer:
 
         return:
         model:(mdn_rnn) trained mdn_rnn object
-        negative_log_losses: (nd.array(float)) the training losses
+        negative_log_likelihoods: (nd.array(float)) the training losses
         """
         optim = optimizer.Adam(learning_rate = lr)
         trainer = gluon.Trainer(model.collect_params(), optim)
@@ -43,9 +45,41 @@ class MDN_RNN_trainer:
         [n_episodes, n_timesteps_per_episode,z_dim] = Z.shape
         [_,_,a_dim] = A.shape
 
-        for e in range(n_epochs):
+        negative_log_probabilities = nd.array(A.shape[:2])
+
+        for epo in range(n_epochs):
             #TODO implement sampling tactic explained in 'World Models', last paragraph of section A.2, to avoid overfitting
-            # for t in range()  
+            for epi in range(n_episodes):
+                model.reset_state()
+
+                with autograd.record():
+
+                    for t in range(n_timesteps_per_episode-1):
+                        z_t = Z[epi,t]
+                        z_tplusone = Z[epi,t+1]
+                        a_t = A[epi,t]
+                        za_t = nd.concat(z_t,a_t,0)
+                        y = model(za_t)
+
+                        negative_log_probability = -y.log_prob(z_tplusone)
+
+                        negative_log_probabilities.backward()
+
+                        negative_log_probabilities[epi,t] = negative_log_probability
+
+
+
+
+
+
+                    
+
+            
+
+
+
+
+
             # z_t = 
             pass
 

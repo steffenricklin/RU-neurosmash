@@ -40,3 +40,6 @@ class MDN_RNN(nn.Block):
         z = self.RNN(x)
         p_t_X = self.MDN(z)
         return p_t_X
+
+    def reset_state(self):
+        self.RNN.reset_state()
