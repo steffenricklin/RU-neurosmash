@@ -8,15 +8,11 @@ ctx = mx.gpu() if mx.test_utils.list_gpus() else mx.cpu()
 
 class ConvVae(gluon.HybridBlock):
     
-    def __init__(self, mu, sigma, size=64):
+    def __init__(self, size=64):
         """
-        size: 
-        mu:
-        sigma:
+        size:
         """
         self.size = size
-        self.mu = mu
-        self.sigma = sigma
         super(ConvVae, self).__init__()
         with self.name_scope():
             # define encoder
