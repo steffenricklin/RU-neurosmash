@@ -122,6 +122,7 @@ class MDN_RNN_trainer:
                             curr_c_grad = c_states[-i-1][0].grad
                             c_states[-i-2][1].backward(curr_c_grad, retain_graph = self.retain_graph) 
 
-                            trainer.step(n_timesteps_per_episode)
+                            # TODO figure out if the parameter here should be 1 or maybe something like n_timesteps_per_episode
+                            trainer.step(1)
 
         return negative_log_probabilities
