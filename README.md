@@ -21,7 +21,7 @@ evaluation metrics: performance, creativity, elegance, rigor, plausibility
 
 ### Phase 1. Implement world models and replicate world model findings 🧩
 
-> Internal deadline: November 20, 2020
+> Internal deadline: December 1st, 2020
 
 We will do something with the world models.
 
@@ -39,7 +39,7 @@ We ideally would like to have
 
 ### Phase 2. Add biological plausibility 🧠
 
-> Internal deadline: November 26, 2020
+> Internal deadline: December 8, 2020
 
 - Can be at the level of learning, network architecture, neuron model, exploration strategy etc.
 - Use the lectures, podcasts, papers for inspiration to come up with a good addition 
@@ -47,7 +47,7 @@ We ideally would like to have
 
 ### Phase 3. Wrapping up and write report 📋
 
-> Internal deadline: December 2, 2020
+> Internal deadline: December 12, 2020
 
 - Fix bugs, make sure everything works smoothly (rigor)
 - Make sure code & documentation is on point (elegance)
