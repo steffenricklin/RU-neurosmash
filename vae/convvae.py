@@ -19,20 +19,36 @@ class Reshape(gluon.HybridBlock):
     def __repr__(self):
         return self.__class__.__name__
 
+    
+class Expand_dims(gluon.HybridBlock):
+    def __init__(self, axis, **kwargs):
+        super().__init__(**kwargs)
+        self.axis = axis
+
+    def hybrid_forward(self, F, x):
+        #print(x.shape)
+        return x.expand_dims(axis=self.axis)
+
+    def __repr__(self):
+        return self.__class__.__name__
+    
 
 class ConvVae(gluon.HybridBlock):
-    
-    def __init__(self, batch_size=100, size=64, z_size=32, **kwargs):
+    """
+    https://github.com/hardmaru/WorldModelsExperiments/blob/master/carracing/vae/vae.py
+    """
+    def __init__(self, batch_size=100, size=64, z_size=32, KL_tolerance_value= 0.5, **kwargs):
         """
         size:
         """
-        self.soft_zero = 1e-6
+        self.soft_zero = 1e-10
         self.output = None
         self.mu = None
         self.batch_size = batch_size
         self.n_latent = 2
         self.size = size
         self.z_size = z_size
+        self.KL_tolerance_value = KL_tolerance_value
         self.ctx = mx.gpu() if mx.test_utils.list_gpus() else mx.cpu()
         super(ConvVae, self).__init__(**kwargs)
         with self.name_scope():
@@ -50,36 +66,40 @@ class ConvVae(gluon.HybridBlock):
         # Input has the shape size x size x 3
         encoder = nn.HybridSequential()
         # relu conv 32 x 4
-        encoder.add(nn.Conv2D(channels=32, in_channels=3, kernel_size=4, strides=2, activation='relu'))
+        encoder.add(nn.Conv2D(channels=32, kernel_size=4, strides=2, activation='relu'))
         # relu conv 64 x 4
-        encoder.add(nn.Conv2D(channels=64, in_channels=32, kernel_size=4, strides=2, activation='relu'))
+        encoder.add(nn.Conv2D(channels=64, kernel_size=4, strides=2, activation='relu'))
         # relu conv 128 x 4
-        encoder.add(nn.Conv2D(channels=128, in_channels=64, kernel_size=4, strides=2, activation='relu'))
+        encoder.add(nn.Conv2D(channels=128, kernel_size=4, strides=2, activation='relu'))
         # relu conv 256 x 4
-        encoder.add(nn.Conv2D(channels=256, in_channels=128, kernel_size=4, strides=2, activation='relu'))
+        encoder.add(nn.Conv2D(channels=256, kernel_size=4, strides=2, activation='relu'))
         # dense layer for mu and log-var
-        encoder.add(nn.Dense(self.z_size*2, activation=None))
-
+        encoder.add(nn.Flatten())
+        self.dense_mu = nn.Dense(units=self.z_size)
+        self.dense_lv = nn.Dense(units=self.z_size)
         return encoder
         
     def get_vae(self, F, h):
         # Get mu and log-variance
-        self.mu, self.lv = F.split(h, axis=1, num_outputs=2)
+        self.mu = self.dense_mu(h)
+        self.lv = self.dense_lv(h)
+        # self.mu, self.lv = F.split(h, axis=1, num_outputs=2)
 
         # Calculate epsilon
         eps = F.random_normal(loc=0, scale=1, shape=(self.batch_size, self.z_size), ctx=self.ctx)
         # Calculate z
-        z = F.exp(0.5 * self.lv)
+        self.sigma = F.exp(0.5 * self.lv)
 #         z = F.broadcast_add(self.mu, F.broadcast_mul(z, eps))
-        z = self.mu + z * eps
+        z = self.mu + self.sigma * eps
         return z
 
     def getDecoder(self):
         decoder = nn.HybridSequential(prefix='decoder')
-        decoder.add(nn.Dense(units=1024, activation=None))
-        decoder.add(Reshape((1024, 1, 1)))
+        decoder.add(nn.Dense(units=1024))
+        decoder.add(Expand_dims(axis=-1))
+        decoder.add(Expand_dims(axis=-1))
         # relu deconv 128x5 to 5x5x128
-        decoder.add(nn.Conv2DTranspose(channels=128, in_channels=1024, kernel_size=5, strides=2, activation='relu'))
+        decoder.add(nn.Conv2DTranspose(channels=128, kernel_size=5, strides=2, activation='relu'))
         # relu deconv 64x5 to 13x13x64
         decoder.add(nn.Conv2DTranspose(channels=64, kernel_size=5, strides=2, activation='relu'))
         # relu deconv 32x6 to 30x30x32
@@ -90,29 +110,34 @@ class ConvVae(gluon.HybridBlock):
         return decoder
 
     def hybrid_forward(self, F, x, *args, **kwargs):
-#         print("x.shape: ", x)
         h = self.encoder(x)
-#         print("h.shape: ", h.shape)
 
         # generate z from h
         z = self.get_vae(F, h)
         
-#         print("z.shape: ", z)
         y = self.decoder(z)
-        y = y.reshape((0,-1))
-        x = x.reshape((0,-1))
         self.output = y
-
+        
         # Mu and log-variance
         mu = self.mu
         lv = self.lv
 
-        # Kullback-Leibler
-        KL = 0.5 * F.sum(1 + lv - mu * mu - F.exp(lv), axis=1)
+        # reconstruction loss
+        self.r_loss = F.sum(F.square(x - y), axis=[1,2,3])
+        self.r_loss = F.mean(self.r_loss)
 
-        xlog = x*F.log(y+self.soft_zero)
-        xminlog = (1-x)*F.log(1-y+self.soft_zero)
+        self.KL = -0.5 * F.sum(1 + lv - F.square(mu) - F.exp(lv), axis=1)
+        self.KL = F.maximum(self.KL, self.KL_tolerance_value * self.z_size)
+        self.KL = F.mean(self.KL)
+
+        loss = self.r_loss + self.KL
+
+        # Kullback-Leibler
+#        KL = 0.5 * F.sum(1 + lv - mu * mu - F.exp(lv), axis=1)
+#
+#        xlog = x*F.log(y+self.soft_zero)
+#        xminlog = (1-x)*F.log(1-y+self.soft_zero)
 #         logloss = F.sum(xlog + xminlog, axis=[1,2,3])
-        logloss = F.sum(xlog + xminlog, axis=1)
-        loss = -logloss-KL
-        return y, loss
+#        logloss = F.sum(xlog + xminlog, axis=1)
+#        loss = -logloss-KL
+        return self.output, loss
