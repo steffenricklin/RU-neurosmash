@@ -6,7 +6,7 @@ from MDN_RNN.mdn import *
 
 class mdn_rnn(nn.Block):
     
-    def __init__(self, z_dim=z_dim, interface_dim=10, n_components=2):
+    def __init__(self, z_dim, h_dim=5, c_dim=5, interface_dim=10, n_components=2):
         super(mdn_rnn, self).__init__()        
 
         """
@@ -25,11 +25,11 @@ class mdn_rnn(nn.Block):
         self.n_components = n_components
 
         # Initialize RNN and MDN
-        self.RNN = LSTM(self.z_dim, self.n_components)
+        self.RNN = LSTM(z_dim, h_dim, c_dim)
         self.MDN = MDN(self.interface_dim,  self.n_components, self.z_dim)
 
 
-    def forward(self, x):
+    def forward(self, x, c, h):
         """
         Forward pass of the model for 1 time step
         
@@ -41,9 +41,9 @@ class mdn_rnn(nn.Block):
             c - nd.array(float): hidden state of the RNN
         #TODO perform gradient descent on:  - log( p( x_t+1 | x ))
         """
-        z, c = self.RNN(x)
-        p_t_X = self.MDN(z)
-        return p_t_X, z, c
+        new_c, new_h = self.RNN(x,c,h)
+        p_t_X = self.MDN(new_c)
+        return p_t_X, new_c, new_h
 
     def reset_state(self):
         self.RNN.reset_state()

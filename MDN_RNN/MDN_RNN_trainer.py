@@ -7,7 +7,7 @@ from MDN_RNN.mdn_rnn import *
 
 class MDN_RNN_trainer:
     """
-    An object to train and evaluate an MDD-RNN model
+    An object to train and evaluate an MDD-RNN model using Truncated BPTT
     """
 
     def __init__(self, lr, k1, k2):
@@ -16,10 +16,9 @@ class MDN_RNN_trainer:
         self.k2 = k2
         self.retain_graph = k1 < k2
 
-
-    def train(self, model:mdn_rnn, data, n_epochs = 10):
+    def train(self, model:mdn_rnn, data, n_epochs = 10, print_every = 10):
         """
-        Trains a given model on data
+        Trains a given model on data. Applies truncated BPTT
 
         :param model (mdn_rnn) 
             the model to be trained
@@ -46,83 +45,63 @@ class MDN_RNN_trainer:
         assert Z.shape[:2] == A.shape[:2], "Hidden states and actions do not have the same number of episodes or timesteps"
 
         [n_episodes, n_timesteps_per_episode,_] = Z.shape
-        print(n_episodes)
 
-        negative_log_probabilities = nd.array([n_epochs]+list(A.shape[:2]))
+        negative_log_probabilities = nd.zeros((n_epochs, n_episodes, n_timesteps_per_episode))
 
         for epo in range(n_epochs):
             #TODO implement sampling tactic explained in 'World Models', last paragraph of section A.2, to avoid overfitting
+            if epo > 0 & epo&print_every == 0:
+                print(f"epoch {epo}")
             for epi in range(n_episodes):
-                model.reset_state()
 
-                Z_episode = Z[epi]
-                A_episode = A[epi]
-                Z_episode.attach_grad()
-                A_episode.attach_grad()
+                c_states = [nd.zeros((1, model.RNN.h_dim))]
+                c_states[0].attach_grad()
+                h_states = [nd.zeros((1, model.RNN.c_dim))]
+                h_states[0].attach_grad()
+                za_states = []
 
-                c_states = [(None, model.RNN.c)]
-                h_states = [(None, model.RNN.h)]
-
+                q=0
                 for t in range(n_timesteps_per_episode-1):
 
+                    print(f"Timestep {t}")
+                    # Remove stuff that is too old
+                    if t > self.k2:
+                        c_states[q] = c_states[q].detach()
+                        nd.BlockGrad(c_states[q])
+                        h_states[q] = h_states[q].detach()
+                        nd.BlockGrad(h_states[q])
+                        za_states[q] = za_states[q].detach()
+                        nd.BlockGrad(za_states[q])
+                        q+=1
+
                     # Combine the current VAE latent and the action to the new input
-                    z_t = Z_episode[t]
-                    z_tplusone = Z_episode[t+1]
-                    a_t = A_episode[t]
-                    za_t = nd.concat(z_t,a_t,0)
-
-                    # Get the hidden state of the previous timestep
-                    c = c_states[-1][1].detach()
-                    c.attach_grad()
-
-                    # Get the output state of the previous timestep
-                    h = h_states[-1][1].detach()
-                    h.attach_grad()
+                    z_t = Z[epi,None,t]                     # Include None to keep the right shape
+                    z_tplusone = Z[epi,None,t+1]    # # Same as above
+                    a_t = A[epi, None,t]
+                    za_t = nd.concat(z_t,a_t,dim=1)
+                    za_t.attach_grad()
+                    za_states.append(za_t)
 
                     with autograd.record():
-
                         # Model the new prediction, and get updated hidden and output states
-                        pz, new_h, new_c = model(za_t)
-                        h_states.append((h, new_h))
-                        c_states.append((c, new_c))
-                    
+                        pz, new_h, new_c = model(za_t, c_states[-1], h_states[-1])
 
-                    # Delete parts of the computation graph that are too old
-                    while len(c_states) > self.k2:
-                        del c_states[0]
-                        del h_states[0]
-
-
+                    h_states.append(new_h)
+                    c_states.append(new_c)
                     # Do bptt every k1 timesteps
                     if (t+1)%self.k1 == 0:
 
                         with autograd.record():
 
                             # Compute the losses
-                            negative_log_probability = -pz.log_prob(z_tplusone)
+                            negative_log_probability = -pz.log_prob(z_tplusone[0])
 
                         # Store the losses
-                        negative_log_probabilities[epo,epi,t] = negative_log_probability.asnumpy()
+                        negative_log_probabilities[epo, epi, t] = negative_log_probability.asnumpy()
 
                         # Do backprop on the current output
-                        negative_log_probability.backward(retain_graph = self.retain_graph)
+                        negative_log_probability.backward(retain_graph = True)
 
-                        # Do backpropagation on the hidden states for the last k2 timesteps
-                        for i in range(self.k2-1):
-
-                            # Stop at the first observation
-                            if c_states[-i-2][0] is None:
-                                break
-
-                            # Propagate backward over h
-                            curr_h_grad = h_states[-i-1][0].grad
-                            h_states[-i-2][1].backward(curr_h_grad, retain_graph = self.retain_graph) 
-
-                            # Propagate backward over c
-                            curr_c_grad = c_states[-i-1][0].grad
-                            c_states[-i-2][1].backward(curr_c_grad, retain_graph = self.retain_graph) 
-
-                            # TODO figure out if the parameter here should be 1 or maybe something like n_timesteps_per_episode
-                            trainer.step(1)
+                        trainer.step(1, ignore_stale_grad=True)
 
         return negative_log_probabilities

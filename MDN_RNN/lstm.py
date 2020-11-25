@@ -2,7 +2,7 @@ from mxnet import nd
 from mxnet.gluon import nn
 
 class LSTM(nn.Block):
-    def __init__(self, x_dim, h_dim, c_dim = 5, i_dim=5, f_dim = 5, o_dim = 5):
+    def __init__(self, x_dim, h_dim=5, c_dim = 5, i_dim=5, f_dim = 5, o_dim = 5):
         super(LSTM, self).__init__()        
         """
         Initialization LSTM model.
@@ -23,14 +23,6 @@ class LSTM(nn.Block):
         self.f_dim = f_dim
         self.o_dim = o_dim
         self.i_dim = i_dim
-        
-        # Surrogate output for first use
-        self.h_0 = nd.zeros(self.h_dim)
-        self.h = self.h_0
-
-        # Surrogate memory for first use
-        self.c_0 = nd.zeros(self.c_dim)
-        self.c = self.c_0
 
         # Weight initialization 
         # Only the output dim is specified, the input dim will be inferred at first use
@@ -50,22 +42,18 @@ class LSTM(nn.Block):
             self.U_c = nn.Dense(self.c_dim, use_bias=False)
 
 
-    def forward(self, X):
+    def forward(self, X, c, h):
         """
         This method closely follows the formulas in RNN/lstm_formulas.png
         """
-        f_t = (self.W_f@X + self.U_f@self.h).sigmoid()
-        i_t = (self.W_i@X + self.U_i@self.h).sigmoid()
-        o_t = (self.W_o@X + self.U_o@self.h).sigmoid()
-        c_tilde_t = (self.W_c@X + self.U_c@self.h).sigmoid()
-        self.c = nd.multiply(f_t, self.c) + nd.multiply(i_t , c_tilde_t)
-        self.h = nd.multiply(o_t, self.c.sigmoid())
-        return self.h, self.c
+        
+        f_t = (self.W_f(X) + self.U_f(h)).sigmoid()
+        i_t = (self.W_i(X) + self.U_i(h)).sigmoid()
+        o_t = (self.W_o(X) + self.U_o(h)).sigmoid()
+        c_tilde_t = (self.W_c(X) + self.U_c(h)).sigmoid()
+        new_c = nd.multiply(f_t, c) + nd.multiply(i_t , c_tilde_t)
+        new_h = nd.multiply(o_t, c.sigmoid())
+        return new_c, new_h
 
-    def reset_state(self):
-        """
-        This method resets the state to s_0, so that a new sequence can be started. 
-        """
-        self.h = self.h_0
-        self.c = self.c_0
+
 
