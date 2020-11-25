@@ -6,8 +6,8 @@ from MDN_RNN.mdn import *
 
 class mdn_rnn(nn.Block):
     
-    def __init__(self, z_dim, h_dim=5, c_dim=5, interface_dim=10, n_components=2):
-        super(mdn_rnn, self).__init__()        
+    def __init__(self, input_dim, output_dim, interface_dim=5, hidden_state_dim=5, n_components=2):
+        super(mdn_rnn, self).__init__()
 
         """
         Initialization Mixture Density Network - RNN model.
@@ -20,16 +20,17 @@ class mdn_rnn(nn.Block):
         """
 
         # Initialize parameters
-        self.z_dim = z_dim
+        self.input_dim = input_dim
+        self.output_dim = output_dim
         self.interface_dim = interface_dim
+        self.hidden_state_dim = hidden_state_dim
         self.n_components = n_components
 
         # Initialize RNN and MDN
-        self.RNN = LSTM(z_dim, h_dim, c_dim)
-        self.MDN = MDN(self.interface_dim,  self.n_components, self.z_dim)
+        self.RNN = LSTM(x_dim=input_dim, h_dim=interface_dim, c_dim=self.hidden_state_dim)
+        self.MDN = MDN(input_dim=self.interface_dim,  n_components=self.n_components, output_dim=self.output_dim)
 
-
-    def forward(self, x, c, h):
+    def forward(self, x, h, c):
         """
         Forward pass of the model for 1 time step
         
@@ -41,9 +42,9 @@ class mdn_rnn(nn.Block):
             c - nd.array(float): hidden state of the RNN
         #TODO perform gradient descent on:  - log( p( x_t+1 | x ))
         """
-        new_c, new_h = self.RNN(x,c,h)
-        p_t_X = self.MDN(new_c)
-        return p_t_X, new_c, new_h
+        new_h, new_c = self.RNN(x,h,c)
+        p_t_X = self.MDN(new_h)
+        return p_t_X, new_h, new_c
 
     def reset_state(self):
         self.RNN.reset_state()

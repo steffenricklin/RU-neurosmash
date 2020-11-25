@@ -6,7 +6,7 @@ from gluonts.mx.distribution.multivariate_gaussian import MultivariateGaussian
 from gluonts.mx.distribution.mixture import MixtureDistribution
 
 class MDN(nn.Block):
-    def __init__(self, x_dim, n_components, t_dim):
+    def __init__(self, input_dim, n_components, output_dim):
         super(MDN, self).__init__()        
         """
         Initialization of MDN model
@@ -14,9 +14,9 @@ class MDN(nn.Block):
         """
 
         # Parameter initialization
-        self.x_dim = x_dim
+        self.x_dim = input_dim
         self.n_components = n_components    # Also referred to as m in Bishop
-        self.t_dim = t_dim                  # Also referred to as c in Bishop
+        self.t_dim = output_dim                  # Also referred to as c in Bishop
         self.z_dim = (self.t_dim + 2)*self.n_components
         self.latent_1_dim = 2*self.x_dim
         self.latent_2_dim = self.x_dim + self.z_dim
@@ -27,19 +27,19 @@ class MDN(nn.Block):
 
             self.linear_1 = nn.Dense(self.latent_1_dim, activation = "relu", use_bias=True)
             self.linear_1.register_op_hook(lambda x: print(x), True)
-            # self.linear_2 = nn.Dense(self.latent_2_dim, activation = "relu", use_bias=True)
-            # self.linear_3 = nn.Dense(self.latent_3_dim, activation = "relu", use_bias=True)
+            self.linear_2 = nn.Dense(self.latent_2_dim, activation = "relu", use_bias=True)
+            self.linear_3 = nn.Dense(self.latent_3_dim, activation = "relu", use_bias=True)
             self.linear_4 = nn.Dense(self.z_dim, use_bias=True) # Final layer is purely linear to give flexibility in mu. Positivity of variance and mixture components is ensured by exponentiation
         
     def forward(self, X):
         # Perform neural network pass
         X = self.linear_1(X)
-        # X = self.linear_2(X)
-        # X = self.linear_3(X)
+        X = self.linear_2(X)
+        X = self.linear_3(X)
         X = self.linear_4(X)
         
         # Extract mixture coefficients according to formula 25 in Bishop
-        z_alpha = X[:,:self.n_components] 
+        z_alpha = X[:,:self.n_components]
         z_alpha_exp = nd.exp(z_alpha)
         alpha = (z_alpha_exp / nd.sum(z_alpha_exp))[0]
 

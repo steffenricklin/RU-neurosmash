@@ -17,10 +17,10 @@ class LSTM(nn.Block):
         """
 
         # Initialize parameters
-        self.x_dim = x_dim
-        self.h_dim = h_dim
-        self.c_dim = c_dim
-        self.f_dim = f_dim
+        self.x_dim = x_dim # Input
+        self.h_dim = h_dim # Output dim
+        self.c_dim = c_dim # Hidden state dim
+        self.f_dim = f_dim # Forget gate dim
         self.o_dim = o_dim
         self.i_dim = i_dim
 
@@ -29,31 +29,27 @@ class LSTM(nn.Block):
         # Since the outputs of these matrices will always be summed, only one of every (W,U) needs a bias term
         with self.name_scope():
 
-            self.W_f = nn.Dense(self.f_dim, use_bias=True)
-            self.U_f = nn.Dense(self.f_dim, use_bias=False)
+            self.W_f = nn.Dense(self.f_dim, in_units = self.x_dim, use_bias=True)
+            self.U_f = nn.Dense(self.f_dim, in_units = self.h_dim, use_bias=False)
 
-            self.W_i = nn.Dense(self.i_dim, use_bias=True)
-            self.U_i = nn.Dense(self.i_dim, use_bias=False)
+            self.W_i = nn.Dense(self.i_dim, in_units = self.x_dim,use_bias=True)
+            self.U_i = nn.Dense(self.i_dim, in_units = self.h_dim,use_bias=False)
             
-            self.W_o = nn.Dense(self.o_dim, use_bias=True)
-            self.U_o = nn.Dense(self.o_dim, use_bias=False)
+            self.W_o = nn.Dense(self.o_dim, in_units = self.x_dim,use_bias=True)
+            self.U_o = nn.Dense(self.o_dim, in_units = self.h_dim,use_bias=False)
 
-            self.W_c = nn.Dense(self.c_dim, use_bias=True)
-            self.U_c = nn.Dense(self.c_dim, use_bias=False)
+            self.W_c = nn.Dense(self.c_dim, in_units = self.x_dim,use_bias=True)
+            self.U_c = nn.Dense(self.c_dim, in_units = self.h_dim,use_bias=False)
 
-
-    def forward(self, X, c, h):
+    def forward(self, X, h, c):
         """
         This method closely follows the formulas in RNN/lstm_formulas.png
         """
-        
         f_t = (self.W_f(X) + self.U_f(h)).sigmoid()
         i_t = (self.W_i(X) + self.U_i(h)).sigmoid()
         o_t = (self.W_o(X) + self.U_o(h)).sigmoid()
         c_tilde_t = (self.W_c(X) + self.U_c(h)).sigmoid()
         new_c = nd.multiply(f_t, c) + nd.multiply(i_t , c_tilde_t)
         new_h = nd.multiply(o_t, c.sigmoid())
-        return new_c, new_h
-
-
+        return new_h, new_c
 
