@@ -54,10 +54,8 @@ class ConvVae(gluon.HybridBlock):
         with self.name_scope():
             # define encoder
             self.encoder = self.getEncoder()
-            
             # define decoder
             self.decoder = self.getDecoder()
-        
     
     def state2image(self, state):
         return np.array(state, "uint8").reshape(self.size, self.size, 3)
