@@ -4,9 +4,7 @@ import scipy.stats as sp
 import Neurosmash
 import matplotlib.pyplot as plt
 import pickle
-from settings import *
-
-import os.path
+from src.settings import *
 from os import path
 
 class Background_Extractor:
@@ -47,31 +45,5 @@ class Background_Extractor:
         return pickle.load(open(target_filename,"rb"))
 
 
-
-
-
-
-
 extr = Background_Extractor()
 extr.get_background(128)
-#
-# background = pickle.load(open(f"{loc}/background_{size}*{size}.p","rb"))
-#
-# n_test_frames = 10
-# frames_counter = 0
-# while games_counter < n_games:
-#     end = 0
-#     while end == 0:
-#         action = agent.step(end, reward, state)
-#         end, reward, state = environment.step(action)
-#         state_rs = np.reshape(state, target_shape)
-#         clean_state = np.where(state_rs == background, 100, state_rs)
-#         fig,ax = plt.subplots(1,2)
-#         ax[0].imshow(state_rs)
-#         ax[1].imshow(clean_state)
-#         plt.show()
-#         frames_counter+=1
-#         if frames_counter >= n_test_frames:
-#             break
-#     if frames_counter >= n_test_frames:
-#         break

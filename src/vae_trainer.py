@@ -1,15 +1,9 @@
-
 # Imports
-from convvae import ConvVae
-import numpy as np
-import PIL
+from vae.convvae import ConvVae
 import mxnet as mx
-from mxnet import nd, autograd, gluon
-from mxnet.gluon import nn
-from sklearn.model_selection import train_test_split
-from tqdm import tqdm
-import matplotlib.pyplot as plt
-import Neurosmash
+from mxnet import gluon, autograd
+from src.background_extractor import *
+import mxnet.ndarray as nd
 
 ip         = "127.0.0.1"
 port       = 13000
@@ -18,29 +12,15 @@ timescale  = 1
 agent = Neurosmash.Agent()
 environment = Neurosmash.Environment(ip, port, size, timescale)
 
-# end (true if the episode has ended, false otherwise)
-# reward (10 if won, 0 otherwise)
-# state (flattened size x size x 3 vector of pixel values)
-# The state can be converted into an image as follows:
-# image = np.array(state, "uint8").reshape(size, size, 3)
-# You can also use to Neurosmash.Environment.state2image(state) function which returns
-# the state as a PIL image
-
-
 def initialise_vae(batch_size=10, z_size=32):
-
     # Create model
     vae = ConvVae(batch_size=batch_size, size=size, z_size=z_size)
-
-    # Initialise weights
+    # Initialise weigh
     vae.collect_params().initialize(mx.init.Xavier(), ctx=vae.ctx)
-
     # Activates hybrid-mode of the Hybrid-Block
     vae.hybridize()
-
     # Initialise trainer
     trainer = gluon.Trainer(vae.collect_params(), 'adam', {'learning_rate': .001})
-
     return vae, trainer
 
 def state2image(state):
@@ -55,10 +35,34 @@ def state2input(state):
 def output2state(output):
     return np.reshape(output.asnumpy(), (1, *orig_shape))[0]
 
-def train_vae(vae, trainer, n_epochs=50, print_period=10, n_images_train=100, n_images_valid=100):
+def remove_background(state, background):
+    cleaned_state = np.where(state == background, 100, state)
+    return cleaned_state
+
+def train_vae(vae, trainer, n_epochs=50, print_period=10, n_images_train=100, n_images_valid=100, n_init_rounds = 5):
 
     training_loss = []
     validation_loss = []
+
+    extr = Background_Extractor()
+    background = np.reshape(extr.get_background(size),(1,-1))
+
+    print("Creating initial data")
+    buffer = nd.zeros((n_init_rounds*500, size*size*3))
+    end, reward, state = environment.reset()
+    buffered_images = 0
+    rounds = 0
+    while buffered_images < n_init_rounds*500 and rounds < 5:
+        while end == 0:
+            action = agent.step(end, reward, state)
+            end, reward, state = environment.step(action)
+            buffer[buffered_images] = state
+            buffered_images += 1
+            if buffered_images < n_init_rounds*500:
+                break
+        rounds += 1
+
+
 
     ### Training
     print('Starting training...')
@@ -68,47 +72,29 @@ def train_vae(vae, trainer, n_epochs=50, print_period=10, n_images_train=100, n_
         end, reward, state = environment.reset()
 
         while not end:
-
-            # Find an action
             action = agent.step(end, reward, state)
-
-            # Take a step; get a new state
             end, reward, state_next = environment.step(action)
-
-
-
-            # If nothing changes anymore, break
             if state == state_next:
                 print('resetting environment')
                 break
-
-            # Save next state
             state = state_next
-
-            # show input
-            # plt.imshow(state2image(state))
-            # plt.show()
-
-            # Train on one image
-            data = state2input(state)
+            state_no_background = remove_background(state, background)
+            data = state2input(state_no_background)
             epoch_loss = 0
             for _ in range(n_epochs):
                 with autograd.record():
                     out, loss = vae(data)
                 loss.backward()
                 trainer.step(1)  # batch size = 1
-                epoch_loss += loss.asscalar()
                 print(epoch_loss)
 
             training_loss.append(epoch_loss/n_epochs)
-
             print(f'training round {i} with loss {epoch_loss/n_epochs}')
 
-
             # Plot training reconstruction
-            # stateagain = output2state(out)
-            # plt.imshow(stateagain)
-            # plt.show()
+            stateagain = output2state(out)
+            plt.imshow(stateagain)
+            plt.show()
 
             # Stop if we have the desired amount of images
             i += 1
