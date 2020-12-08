@@ -11,9 +11,9 @@ class ES_trainer():
     def __init__(self, pop_size, elite_size):
         """
         Gaussian Evolution Strategy algorithm (without covariances)
-        :param Λ         (float) population size
-        :param λ         (float) elite group size 
-        :param w_dim     (int) shape of weights to be optimized
+        :param pop_size   (float) population size
+        :param elite_size (float) elite group size
+        :param w_dim      (int) shape of weights to be optimized
         """
         self.elite_size = elite_size
         self.pop_size = pop_size
