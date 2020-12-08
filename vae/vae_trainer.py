@@ -75,6 +75,8 @@ def train_vae(vae, trainer, n_epochs=50, print_period=10, n_images_train=100, n_
             # Take a step; get a new state
             end, reward, state_next = environment.step(action)
 
+
+
             # If nothing changes anymore, break
             if state == state_next:
                 print('resetting environment')
