@@ -130,7 +130,4 @@ dmypy.json
  
 myenv/
 venv/
-/myenv/
-/venv/
-/.vscode/
-/.idea/
+.idea/

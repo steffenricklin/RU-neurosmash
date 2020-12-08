@@ -1,7 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="0d3408f8-30df-48d4-ab88-ddbd243ebe7a" name="Default Changelist" comment="" />
+    <list default="true" id="0d3408f8-30df-48d4-ab88-ddbd243ebe7a" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/src/train_tester.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/vae/vae_online_trainer_with_background_removal.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/RU-neurosmash.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/RU-neurosmash.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/background_extractor.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/background_extractor.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/vae/convvae.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/vae/convvae.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/vae/vae_trainer.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/vae/vae_trainer.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -17,7 +27,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="rollout" />
+        <entry key="$PROJECT_DIR$" value="main" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -43,14 +53,14 @@
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/notebooks" />
       <recent name="$PROJECT_DIR$/data/images/RNN-images" />
       <recent name="$PROJECT_DIR$/src/utils" />
-      <recent name="$PROJECT_DIR$/src/notebooks" />
       <recent name="$PROJECT_DIR$/src/vae" />
       <recent name="$PROJECT_DIR$/data/images" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.test">
+  <component name="RunManager" selected="Python.train_tester">
     <configuration name="background_extractor" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="RU-neurosmash" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -87,6 +97,28 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/MDN_RNN/test.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="train_tester" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="RU-neurosmash" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/train_tester.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -144,14 +176,15 @@
       <item itemvalue="Python.test" />
       <item itemvalue="Python.vae_test_python_file" />
       <item itemvalue="Python.vae_trainer" />
+      <item itemvalue="Python.train_tester" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.train_tester" />
         <item itemvalue="Python.vae_trainer" />
         <item itemvalue="Python.vae_test_python_file" />
         <item itemvalue="Python.test" />
         <item itemvalue="Python.background_extractor" />
-        <item itemvalue="Python.vae_test_python_file" />
       </list>
     </recent_temporary>
   </component>
@@ -209,7 +242,14 @@
       <option name="project" value="LOCAL" />
       <updated>1607451881538</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="Moved one more notebook">
+      <created>1607452644669</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1607452644669</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -234,11 +274,24 @@
     <MESSAGE value="merged controller in, now going to re-structure stuff" />
     <MESSAGE value="Merge branch 'background_extraction' into main&#10;&#10;# Conflicts:&#10;#&#9;src/vae/.DS_Store&#10;#&#9;src/vae/offline_vae.py&#10;#&#9;src/vae_trainer.py" />
     <MESSAGE value="Restucturing, refactoring, everybody happy" />
-    <option name="LAST_COMMIT_MESSAGE" value="Restucturing, refactoring, everybody happy" />
+    <MESSAGE value="Moved one more notebook" />
+    <option name="LAST_COMMIT_MESSAGE" value="Moved one more notebook" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/src/vae/vae_train.py</url>
+          <line>2</line>
+          <option name="timeStamp" value="2" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/RU_neurosmash$test.coverage" NAME="test Coverage Results" MODIFIED="1606926587705" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/MDN_RNN" />
     <SUITE FILE_PATH="coverage/RU_neurosmash$background_extractor.coverage" NAME="background_extractor Coverage Results" MODIFIED="1607442204781" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/RU_neurosmash$train_tester.coverage" NAME="train_tester Coverage Results" MODIFIED="1607457676875" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/" />
     <SUITE FILE_PATH="coverage/RU_neurosmash$vae_test_python_file.coverage" NAME="vae_test_python_file Coverage Results" MODIFIED="1607440070192" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/vae" />
     <SUITE FILE_PATH="coverage/RU_neurosmash$vae_trainer.coverage" NAME="vae_trainer Coverage Results" MODIFIED="1607443790902" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
     <SUITE FILE_PATH="coverage/RU_neurosmash$vae_offline_trainer.coverage" NAME="vae_offline_trainer Coverage Results" MODIFIED="1607281504193" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/vae" />

@@ -10,18 +10,20 @@ from settings import *
 
 class Background_Extractor:
 
+    def __init__(self, env, agent):
+        self.env = env
+        self.agent = agent
+
     def extract_and_save_background(self, n_frames = 100):
         target_shape = (size,size,3)
         buffer = np.zeros((n_frames,size,size,3))
-        agent = Neurosmash.Agent()
-        environment = Neurosmash.Environment()
         frames_counter = 0
-        end,reward,state = environment.reset()
+        end,reward,state = self.env.reset()
         while frames_counter < n_frames:
             end = 0
             while end == 0:
-                action = agent.step(end, reward, state)
-                end, reward, state = environment.step(action)
+                action = self.agent.step(end, reward, state)
+                end, reward, state = self.env.step(action)
                 buffer[frames_counter] = np.reshape(state, target_shape)
                 frames_counter+=1
                 if frames_counter >= n_frames:

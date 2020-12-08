@@ -5,10 +5,7 @@ from mxnet import gluon, autograd
 from utils.background_extractor import *
 import mxnet.ndarray as nd
 
-ip         = "127.0.0.1"
-port       = 13000
-size       = 128  # 96, 192
-timescale  = 1
+
 agent = Neurosmash.Agent()
 environment = Neurosmash.Environment(ip, port, size, timescale)
 

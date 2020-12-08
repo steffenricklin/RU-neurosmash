@@ -3,6 +3,7 @@ import Neurosmash
 import mxnet as mx
 from mxnet import nd, autograd, gluon
 from mxnet.gluon import nn
+from settings import *
 
 
 class Reshape(gluon.HybridBlock):
@@ -40,7 +41,7 @@ class ConvVae(gluon.HybridBlock):
     https://github.com/hardmaru/WorldModelsExperiments/blob/master/carracing/vae/vae.py
     """
 
-    def __init__(self, batch_size=100, size=64, z_size=32, KL_tolerance_value=0.5, **kwargs):
+    def __init__(self, batch_size=100,  z_size=32, KL_tolerance_value=0.5, **kwargs):
         """
         size:
         """
@@ -103,7 +104,7 @@ class ConvVae(gluon.HybridBlock):
 
     def getDecoder(self):
         decoder = nn.HybridSequential(prefix='decoder')
-        decoder.add(nn.Dense(units=9216))  # 1024 for size=64, 9216 for size=128
+        decoder.add(nn.Dense(units=1024))  # 1024 for size=64, 9216 for size=128
         decoder.add(Expand_dims(axis=-1))
         decoder.add(Expand_dims(axis=-1))
         # relu deconv 128x5 to 5x5x128
@@ -112,8 +113,8 @@ class ConvVae(gluon.HybridBlock):
         decoder.add(nn.Conv2DTranspose(channels=64, kernel_size=5, strides=2, activation='relu'))
         # relu deconv 32x6 to 30x30x32
         # decoder.add(nn.Conv2DTranspose(channels=32, kernel_size=6, strides=2, activation='relu'))
-        decoder.add(nn.Conv2DTranspose(channels=32, kernel_size=5, strides=2, activation='relu'))
-        decoder.add(nn.Conv2DTranspose(channels=16, kernel_size=6, strides=2, activation='relu'))
+        decoder.add(nn.Conv2DTranspose(channels=32, kernel_size=6, strides=2, activation='relu'))
+        # decoder.add(nn.Conv2DTranspose(channels=16, kernel_size=6, strides=2, activation='relu'))
 
         # sigmoid deconv 3x6 to 64x64x3
         decoder.add(nn.Conv2DTranspose(channels=3, kernel_size=6, strides=2, activation='sigmoid'))
@@ -136,7 +137,7 @@ class ConvVae(gluon.HybridBlock):
         lv = self.lv
 
         # reconstruction loss (MSE)
-        self.r_loss = F.sum(F.power((x - y), 2), axis=[1, 2, 3])
+        self.r_loss = F.sum(F.power((x - y), 6), axis=[1, 2, 3])
         self.r_loss = F.mean(self.r_loss)
 
         # Kullback-Leibler divergence
