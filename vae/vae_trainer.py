@@ -14,7 +14,7 @@ import Neurosmash
 ip         = "127.0.0.1"
 port       = 13000
 size       = 128  # 96, 192
-timescale  = 1
+timescale  = 10
 agent = Neurosmash.Agent()
 environment = Neurosmash.Environment(ip, port, size, timescale)
 
@@ -55,16 +55,15 @@ def state2input(state):
 def output2state(output):
     return np.reshape(output.asnumpy(), (1, *orig_shape))[0]
 
-def train_vae(vae, trainer, n_epochs=50, print_period=10, n_images_train=100, n_images_valid=100):
+def run_vae(vae, trainer, train=True, n_epochs=50, n_images=100, show_input=False, show_output=False):
 
-    training_loss = []
-    validation_loss = []
+    total_loss = []
 
     ### Training
     print('Starting training...')
     i = 0
-    while i < n_images_train:
-        print('New battle in training mode...')
+    while i < n_images:
+
         end, reward, state = environment.reset()
 
         while not end:
@@ -83,84 +82,44 @@ def train_vae(vae, trainer, n_epochs=50, print_period=10, n_images_train=100, n_
             # Save next state
             state = state_next
 
-            # show input
-            # plt.imshow(state2image(state))
-            # plt.show()
+            if show_input:
+                # show input
+                plt.imshow(state2image(state))
+                plt.show()
+                plt.close()
 
             # Train on one image
             data = state2input(state)
             epoch_loss = 0
             for _ in range(n_epochs):
-                with autograd.record():
+
+                if train:
+                    with autograd.record():
+                        out, loss = vae(data)
+                    loss.backward()
+                    trainer.step(1)  # batch size = 1
+                else:
                     out, loss = vae(data)
-                loss.backward()
-                trainer.step(1)  # batch size = 1
+
                 epoch_loss += loss.asscalar()
-                print(epoch_loss)
 
-            training_loss.append(epoch_loss/n_epochs)
+            total_loss.append(epoch_loss/n_epochs)
 
-            print(f'training round {i} with loss {epoch_loss/n_epochs}')
+            print(f'round {i} with loss {epoch_loss/n_epochs}')
 
-
-            # Plot training reconstruction
-            # stateagain = output2state(out)
-            # plt.imshow(stateagain)
-            # plt.show()
-
-            # Stop if we have the desired amount of images
-            i += 1
-            if i >= n_images_train:
-                end = 1
-
-
-    ### Validation
-    print('Starting validation...')
-
-    i = 0
-    while i < n_images_valid:
-        print('New battle in validation mode...')
-        end, reward, state = environment.reset()
-
-        while not end:
-
-            # Find an action
-            action = agent.step(end, reward, state)
-
-            # Take a step; get a new state
-            end, reward, state_next = environment.step(action)
-
-            # If nothing changes anymore, presumably when an agent has died, break
-            if state == state_next:
-                print('resetting environment')
-                break
-
-            # Save next state
-            state = state_next
-
-            data = state2input(state)
-
-            epoch_val_loss = 0
-            for _ in range(n_epochs):
-                out, loss = vae(data)
-                print(f'validation loss: {loss}')
-                epoch_val_loss += loss.asscalar()
-            validation_loss.append(epoch_val_loss/n_epochs)
-
-
-
-            # Plot validation reconstruction
-            print(f'validation reconstruction after {i} images')
-            stateagain = output2state(out)
-            plt.imshow(stateagain)
-            plt.show()
+            if show_output:
+                # Plot reconstruction
+                state_again = output2state(out)
+                plt.imshow(state_again)
+                plt.show()
+                plt.close()
 
             # Stop if we have the desired amount of images
             i += 1
-            if i >= n_images_train:
+            if i >= n_images:
                 end = 1
 
-    return training_loss, validation_loss
+    return total_loss
 
 
 def plot_reconstruction(out):
@@ -169,10 +128,7 @@ def plot_reconstruction(out):
     plt.show()
 
 
-def plot_loss(n_epochs, training_loss, validation_loss):
-    # batch_x = np.linspace(1, n_epochs, len(training_loss))
-    # plt.plot(batch_x, np.array(training_loss))
-    # plt.plot(batch_x, np.array(validation_loss))
+def plot_loss(training_loss, validation_loss):
     plt.plot(training_loss)
     plt.plot(validation_loss)
     plt.legend(['train', 'valid'])
@@ -186,19 +142,58 @@ def run(n_images_train=100, n_images_valid=100, n_epochs=10):
     print('VAE initialised...')
 
     # Train the VAE
-    training_loss, validation_loss = train_vae(
-        vae, trainer, n_epochs, print_period=1, n_images_train=n_images_train, n_images_valid=n_images_valid
+    training_loss = run_vae(
+        vae, trainer, train=True, n_epochs=n_epochs, n_images=n_images_train, show_input=False, show_output=False
     )
-    print('vae trained...')
+    print('VAE trained...')
 
-    plot_loss(n_epochs, training_loss, validation_loss)
-    # print('loss plotted...')
+    # Validate the VAE
+    validation_loss = run_vae(
+        vae, trainer, train=False, n_epochs=n_epochs, n_images=n_images_valid, show_input=False, show_output=False
+    )
+    print('VAE validated...')
+
+    plot_loss(training_loss, validation_loss)
+    print('Loss plotted...')
+
+    # Save model
+    file_name = "net.params"
+    vae.save_parameters(file_name)
+    print('Model saved...')
+
+    # Load model
+    # new_vae = initialise_vae(batch_size=1, z_size=32)
+    # new_vae.load_parameters(file_name, ctx=vae.ctx)
 
     # compare_io(images, outputs)
     # print('comparison done.')
 
 
+
+# def dream():
+#     # the dreaming
+#     # n_samples = 2
+#     # dream_states = vae.dream(n_samples=n_samples)
+#     # dream_states = dream_states.asnumpy()
+#     # dream_samples = np.transpose(dream_states, (0, 2, 3, 1))
+#     # plt.imshow(dream_samples[0])
+#     # plt.show()
+#
+#
+#     # canvas = np.empty((size * n_samples, size * n_samples, 3))
+#     # for i, img in enumerate(dream_samples):
+#     #     x = i // n_samples
+#     #     y = i % n_samples
+#     #     canvas[(n_samples - y - 1) * size:(n_samples - y) * size,
+#     #     x * size:(x + 1) * size] = img  # img.reshape(size, size)
+#     # plt.figure(figsize=(8, 8))
+#     # plt.imshow(canvas, origin="upper", cmap="Greys")
+#     # plt.axis('off')
+#     # plt.tight_layout()
+#     # plt.title("Look at it. How cute, it's dreaming \u2665 ")
+#     # plt.show()
+
 orig_shape = (size, size, 3)
 tens_shape = (3, size, size)
 if __name__ == '__main__':
-    run(n_images_train=250, n_images_valid=100, n_epochs=4)
+    run(n_images_train=250, n_images_valid=100, n_epochs=1)
