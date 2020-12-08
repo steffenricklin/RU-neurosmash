@@ -2,12 +2,13 @@ import numpy as np
 np.random.seed(2020)
 from settings import *
 
-class Controller()
+class Controller():
 
-    def __init__(self, weights):
+    def __init__(self, weights=np.random.normal(0,1, z_dim+h_dim)):
         self.weights = weights
 
-    def action(S, theta=0):
+
+    def action(self, S, theta=0):
         """
         Get an action from the controller
         Computes a_t = W_c [z_t h_t] + b_t

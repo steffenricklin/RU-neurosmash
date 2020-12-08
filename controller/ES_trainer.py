@@ -1,16 +1,16 @@
 import numpy as np
 np.random.seed(2020)
 from multiprocessing import Pool
-from scipy import random, linalg
 import os
 from tqdm import tqdm
 import time
 from settings import *
-from misc import rollout
+from rollout import rollout
+from controller.Controller import *
 
 class ES_trainer():
     
-    def __init__(self, Λ, λ, loss_func='rollout'):
+    def __init__(self, Λ, λ):
         """
         Gaussian Evolution Strategy algorithm (without covariances)
         :param Λ         (float) population size
@@ -22,11 +22,7 @@ class ES_trainer():
         self.w_dim = z_dim + h_dim
         self.weights = np.random.normal(0,1,self.w_dim)
         self.σ = 1
-
-        if loss_func = 'rollout':
-            self.loss_func = rollout
-        else:
-            print('No loss function to evaluate')
+        self.loss_func = rollout
         
     def train(self, n_iter):
         """
@@ -35,8 +31,6 @@ class ES_trainer():
         :return θ        (matrix) parameter values for each iteration, 
         :return fitness  (matrix) fitness score for each member for each iteration
         """
-        if self.loss_func = 'rollout':
-            loss_func
         Λ, λ   = self.Λ, self.λ
         w, σ   = self.weights, self.σ
         reward = np.zeros((n_iter, Λ+1))
@@ -49,8 +43,8 @@ class ES_trainer():
             
             # Multiprocess each population member
             with Pool(os.cpu_count()) as pool:
-                fitness = pool.map(loss_func, population) # use starmap() for multiple argument functions.
-            reward[i,:] = np.append(loss_func(w), fitness)
+                fitness = pool.map(self.loss_func, population) # use starmap() for multiple argument functions.
+            reward[i,:] = np.append(self.loss_func(w), fitness)
 
             # Sort population and take elite            
             elite_idx  = np.argsort(fitness)[:λ]
@@ -60,8 +54,7 @@ class ES_trainer():
             w = np.mean(elite, axis=0)
             σ = np.sum((elite-w)**2) / λ
 
-            if i%1==0:
-                i=contour_plot_iteration(X, Y, Z, population, elite, w, i+1, reward[i,0], ax=ax[i])
+
         toc = time.perf_counter()
         print(f'Time elapsed: {toc - tic:0.4f} seconds')
         

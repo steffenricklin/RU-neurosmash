@@ -16,6 +16,8 @@ import Neurosmash
 from settings import *
 from MDN_RNN.mdn_rnn import mdn_rnn
 from vae.convvae import ConvVae
+from controller.Controller import *
+from controller.ES_trainer import *
 
 
 def set_up_env():
@@ -37,16 +39,19 @@ def get_models(ctx):
 
     # Create the RNN and load its parameter settings
     rnn = mdn_rnn(z_dim, h_dim)  # z_dim and h_dim are import from settings.py
-    rnn.load_parameters(path_to_rnn_params, ctx=ctx)
+    #rnn.load_parameters(path_to_rnn_params, ctx=ctx)
 
     # Create the VAE and load its parameter settings
     vae = ConvVae()
-    vae.load_parameters(path_to_vae_params, ctx=ctx)
+    #vae.load_parameters(path_to_vae_params, ctx=ctx)
 
     # Create the controller and load its parameter settings
-    controller = None
+    controller = Controller()
     # controller.load_parameters(path_to_ctrl_params, ctx=ctx)
-    
+    #es_trainer = ES_trainer(100, 10)
+    #w, reward = es_trainer.train(n_iter=20)
+    #print(w, reward)
+
     return rnn, vae, controller
 
 
