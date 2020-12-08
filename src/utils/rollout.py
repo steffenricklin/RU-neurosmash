@@ -1,22 +1,12 @@
-import numpy as np
 import mxnet as mx
-from mxnet import nd, autograd, gluon
-from mxnet.gluon import nn
-from sklearn.model_selection import train_test_split
 # !pip install tqdm
-from tqdm.notebook import tqdm as tqdm_notebook
-from tqdm import tqdm
-from matplotlib import pyplot as plt
 
 # for Neurosmash
-import PIL
 import Neurosmash
 
 # our settings and models
-from settings import *
 from MDN_RNN.mdn_rnn import mdn_rnn
 from vae.convvae import ConvVae
-from controller.Controller import *
 from controller.ES_trainer import *
 
 
@@ -28,7 +18,7 @@ def set_up_env():
 
     # This is the main environment.
     try:
-        environment = Neurosmash.Environment(ip, port, size, timescale)
+        environment = Neurosmash.Environment()
     except:
         print("Connecting to environment failed. Please make sure Neurosmash is running and check your settings.")
     else:

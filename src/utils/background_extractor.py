@@ -6,20 +6,15 @@ import matplotlib.pyplot as plt
 import pickle
 from src.settings import *
 from os import path
+from settings import *
 
 class Background_Extractor:
-    def __init__(self, ip = "127.0.0.1", port = 13000, timescale = 1):
-        print(project_dir)
-        self.ip =ip
-        self.port =port
-        self.timescale = timescale
-        self.loc = f"{project_dir}/background_images"
 
-    def extract_and_save_background(self, size, n_frames = 100):
+    def extract_and_save_background(self, n_frames = 100):
         target_shape = (size,size,3)
         buffer = np.zeros((n_frames,size,size,3))
         agent = Neurosmash.Agent()
-        environment = Neurosmash.Environment(self.ip, self.port, size, self.timescale)
+        environment = Neurosmash.Environment()
         frames_counter = 0
         end,reward,state = environment.reset()
         while frames_counter < n_frames:
@@ -34,16 +29,13 @@ class Background_Extractor:
         mode, count = sp.mode(buffer, axis = 0)
         fig, ax = plt.subplots()
         ax.imshow(np.squeeze(mode)/255)
-        plt.savefig(f"{self.loc}/background_{size}*{size}.png")
+        plt.savefig(f"{image_dir}/background_{size}*{size}.png")
         plt.show()
-        pickle.dump(np.squeeze(mode),open(f"{self.loc}/background_{size}*{size}.p","wb"))
+        pickle.dump(np.squeeze(mode),open(f"{image_dir}/background_{size}*{size}.p","wb"))
 
-    def get_background(self, size):
-        target_filename = f"{self.loc}/background_{size}*{size}.p"
+    def get_background(self):
+        target_filename = f"{image_dir}/background_{size}*{size}.p"
         if not path.exists(target_filename):
-            self.extract_and_save_background(size)
+            self.extract_and_save_background()
         return pickle.load(open(target_filename,"rb"))
 
-
-extr = Background_Extractor()
-extr.get_background(128)

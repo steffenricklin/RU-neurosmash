@@ -2,7 +2,7 @@
 from vae.convvae import ConvVae
 import mxnet as mx
 from mxnet import gluon, autograd
-from src.background_extractor import *
+from utils.background_extractor import *
 import mxnet.ndarray as nd
 
 ip         = "127.0.0.1"

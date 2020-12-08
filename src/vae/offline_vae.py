@@ -1,4 +1,3 @@
-
 # Imports
 from convvae import ConvVae
 import numpy as np
@@ -14,26 +13,6 @@ import Neurosmash
 from numpy import asarray
 from numpy import savez_compressed
 from numpy import load
-
-
-
-
-
-ip         = "127.0.0.1"
-port       = 13000
-size       = 128  # 96, 192
-timescale  = 1
-# agent = Neurosmash.Agent()
-# environment = Neurosmash.Environment(ip, port, size, timescale)
-
-# end (true if the episode has ended, false otherwise)
-# reward (10 if won, 0 otherwise)
-# state (flattened size x size x 3 vector of pixel values)
-# The state can be converted into an image as follows:
-# image = np.array(state, "uint8").reshape(size, size, 3)
-# You can also use to Neurosmash.Environment.state2image(state) function which returns
-# the state as a PIL image
-
 
 def roam_and_collect(rounds=1, save=False):
     data = []

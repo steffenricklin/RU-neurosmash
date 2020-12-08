@@ -1,11 +1,9 @@
 import numpy as np
 np.random.seed(2020)
 from multiprocessing import Pool
-import os
 from tqdm import tqdm
 import time
-from settings import *
-from rollout import rollout
+from utils.rollout import rollout
 from controller.Controller import *
 
 class ES_trainer():
