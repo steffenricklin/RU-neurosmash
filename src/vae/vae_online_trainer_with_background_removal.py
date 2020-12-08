@@ -72,7 +72,7 @@ class Background_Trainer:
             while end == 0:
                 action = self.agent.step(end, reward, state)
                 end, reward, state = self.env.step(action)
-                cleanstate = np.where(state == self.background, 10, state)
+                cleanstate = np.where(state == self.background, 200, state)
                 buffer[buffered_images] = cleanstate/255
                 buffered_images += 1
                 if buffered_images >= max_images:
@@ -89,7 +89,7 @@ class Background_Trainer:
         while end == 0:
             action = self.agent.step(end, reward, state)
             end, reward, state = self.env.step(action)
-            cleanstate = np.where(state == self.background, 10, state)
+            cleanstate = np.where(state == self.background, 200, state)
             buffer[buffered_images] = cleanstate/255
             buffered_images += 1
             if buffered_images >= max_images:
