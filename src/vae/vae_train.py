@@ -2,12 +2,9 @@
 # Imports
 from convvae import ConvVae
 import numpy as np
-import PIL
 import mxnet as mx
 from mxnet import nd, autograd, gluon
-from mxnet.gluon import nn
 from sklearn.model_selection import train_test_split
-from tqdm.notebook import tqdm as tqdm_notebook
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 import Neurosmash
