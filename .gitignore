@@ -132,5 +132,5 @@ myenv/
 venv/
 /myenv/
 /venv/
-/.idea/
 /.vscode/
+/.idea/

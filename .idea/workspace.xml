@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="0d3408f8-30df-48d4-ab88-ddbd243ebe7a" name="Default Changelist" comment="" />
+    <list default="true" id="0d3408f8-30df-48d4-ab88-ddbd243ebe7a" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -43,11 +45,11 @@
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/data/images/RNN-images" />
       <recent name="$PROJECT_DIR$/src/utils" />
       <recent name="$PROJECT_DIR$/src/notebooks" />
       <recent name="$PROJECT_DIR$/src/vae" />
       <recent name="$PROJECT_DIR$/data/images" />
-      <recent name="$PROJECT_DIR$/src" />
     </key>
   </component>
   <component name="RunManager" selected="Python.test">
@@ -179,7 +181,7 @@
       <updated>1607444685870</updated>
       <workItem from="1607444694491" duration="1006000" />
       <workItem from="1607447223928" duration="1004000" />
-      <workItem from="1607450983148" duration="612000" />
+      <workItem from="1607450983148" duration="907000" />
     </task>
     <task id="LOCAL-00003" summary="Merging everything, these files are complaining so I added them">
       <created>1607444855673</created>
@@ -202,7 +204,14 @@
       <option name="project" value="LOCAL" />
       <updated>1607451477455</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="Restucturing, refactoring, everybody happy">
+      <created>1607451881538</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1607451881538</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
