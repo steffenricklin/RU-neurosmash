@@ -10,4 +10,3 @@ timescale = 5  # This is the simulation speed of the environment.
 path_to_rnn_params = "parameters/mdn_rnn.params"
 path_to_vae_params = "parameters/vae.params"
 path_to_ctrl_params = "parameters/controller.params"
-

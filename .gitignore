@@ -129,6 +129,8 @@ dmypy.json
 .pyre/
  
 myenv/
-
+venv/
+/myenv/
+/venv/
 /.idea/
 /.vscode/

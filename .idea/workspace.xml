@@ -1,7 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="0d3408f8-30df-48d4-ab88-ddbd243ebe7a" name="Default Changelist" comment="" />
+    <list default="true" id="0d3408f8-30df-48d4-ab88-ddbd243ebe7a" name="Default Changelist" comment="Merge branch 'background_extraction' into main&#10;&#10;# Conflicts:&#10;#&#9;src/vae/.DS_Store&#10;#&#9;src/vae/offline_vae.py&#10;#&#9;src/vae_trainer.py">
+      <change afterPath="$PROJECT_DIR$/src/background_extractor.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/RU-neurosmash.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/RU-neurosmash.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/vae/offline_vae.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/vae/offline_vae.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/vae_trainer.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/vae_trainer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vae/Neurosmash.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/vae/Neurosmash.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vae/convvae.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/vae/convvae.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vae/offline_vae.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vae/vae.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/vae/vae.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vae/vae_train.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/vae/vae_train.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vae/vae_trainer.py" beforeDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -182,7 +197,14 @@
       <option name="project" value="LOCAL" />
       <updated>1607444855673</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="merged controller in, now going to re-structure stuff">
+      <created>1607446051739</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1607446051739</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -195,7 +217,8 @@
     <MESSAGE value="Made a working background extractor yippy" />
     <MESSAGE value="Working on the experience replay, but I am going to push the new directory structure everywhere first" />
     <MESSAGE value="Merging everything, these files are complaining so I added them" />
-    <option name="LAST_COMMIT_MESSAGE" value="Merging everything, these files are complaining so I added them" />
+    <MESSAGE value="merged controller in, now going to re-structure stuff" />
+    <option name="LAST_COMMIT_MESSAGE" value="merged controller in, now going to re-structure stuff" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/RU_neurosmash$test.coverage" NAME="test Coverage Results" MODIFIED="1606926587705" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/MDN_RNN" />
