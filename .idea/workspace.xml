@@ -1,20 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="0d3408f8-30df-48d4-ab88-ddbd243ebe7a" name="Default Changelist" comment="Going to train all night">
-      <change afterPath="$PROJECT_DIR$/src/classifier/agent_location_classifier.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/classifier/agent_locator.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/classifier/classifier_test.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/utils/converters.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/MDN_RNN/lstm.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/MDN_RNN/lstm.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/MDN_RNN/mdn.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/MDN_RNN/mdn.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/MDN_RNN/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/MDN_RNN/test.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/train_tester.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/train_tester.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils/background_extractor.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/background_extractor.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/vae/convvae.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/vae/convvae.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/vae/vae_online_trainer_with_background_removal.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/vae/vae_online_trainer_with_background_removal.py" afterDir="false" />
-    </list>
+    <list default="true" id="0d3408f8-30df-48d4-ab88-ddbd243ebe7a" name="Default Changelist" comment="Going to train all night" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -175,11 +162,11 @@
       <method v="2" />
     </configuration>
     <list>
+      <item itemvalue="Python.classifier_test" />
       <item itemvalue="Python.test" />
+      <item itemvalue="Python.train_tester" />
       <item itemvalue="Python.vae_test_python_file" />
       <item itemvalue="Python.vae_trainer" />
-      <item itemvalue="Python.train_tester" />
-      <item itemvalue="Python.classifier_test" />
     </list>
     <recent_temporary>
       <list>
