@@ -38,30 +38,41 @@ def get_models(ctx):
     # Create the controller and load its parameter settings
     controller = Controller()
     # controller.load_parameters(path_to_ctrl_params, ctx=ctx)
-    #es_trainer = ES_trainer(100, 10)
-    #w, reward = es_trainer.train(n_iter=20)
-    #print(w, reward)
 
     return rnn, vae, controller
 
+class RolloutGenerator():
 
-def rollout(controller):
-    """
-    environment, rnn, vae are global variables
-    :param controller:
-    :return: cumulative_reward
-    """
-    obs = environment.reset()
-    h = rnn.reset_state()
-    done = False
-    cumulative_reward = 0
-    while not done:
-        z = vae.encode(obs)
-        a = controller.action(z, h)
-        obs, reward, done = environment.step(a)
-        cumulative_reward += reward
-        h = rnn.forward([a, z, h])
-    return cumulative_reward
+    def __init__(self, environment, vae, rnn):
+        self.environment = environment
+        self.vae = vae
+        self.rnn = rnn
+
+
+    def rollout(self, controller):
+        """
+        environment, rnn, vae are global variables
+        :param controller:
+        :return: cumulative_reward
+        """
+        environment, vae, rnn = self.environment, self.vae, self.rnn
+
+        end, reward, state = environment.reset()
+        print(f'Initial - end: {end}, reward: {reward}, len state: {len(state)}')
+
+
+        h = np.zeros(h_dim) #h = rnn.reset_state()
+        cumulative_reward = 0
+
+        while (end==0):
+            #z = vae.encode(state)
+            z = np.ones(z_dim)
+            a = controller.action(z, h)
+            end, reward, state = environment.step(a)
+            cumulative_reward += reward
+            #h = rnn.forward([a, z, h])
+
+        return cumulative_reward
 
 
 if __name__ == '__main__':
@@ -69,5 +80,9 @@ if __name__ == '__main__':
     
     agent, environment = set_up_env()
     rnn, vae, controller = get_models(ctx)
-    
-    cum_reward = rollout(controller)
+    generator = RolloutGenerator(environment, rnn, vae)
+    cumulative_reward = generator.rollout(controller)
+    print(cumulative_reward)
+    es_trainer = ES_trainer(generator, 100, 10)
+    w, reward = es_trainer.train(n_iter=20)
+    print(w, reward)
