@@ -41,18 +41,17 @@ class ConvVae(gluon.HybridBlock):
     https://github.com/hardmaru/WorldModelsExperiments/blob/master/carracing/vae/vae.py
     """
 
-    def __init__(self, batch_size=100,  z_size=32, KL_tolerance_value=0.5, **kwargs):
+    def __init__(self, batch_size=100,  z_size=64, KL_tolerance_value=10, **kwargs):
         """
         size:
         """
         # To avoid zero division
         self.soft_zero = 1e-10
         #
-        self.beta = 2
+        self.beta = 1
         self.output = None
         self.mu = None
         self.batch_size = batch_size
-        self.n_latent = 2
         self.size = size
         self.z_size = z_size
         self.KL_tolerance_value = KL_tolerance_value

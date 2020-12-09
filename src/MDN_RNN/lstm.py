@@ -2,7 +2,7 @@ from mxnet import nd
 from mxnet.gluon import nn
 
 class LSTM(nn.Block):
-    def __init__(self, x_dim, h_dim=5, c_dim = 5, i_dim=5, f_dim = 5, o_dim = 5):
+    def __init__(self, x_dim, h_dim=5):
         super(LSTM, self).__init__()        
         """
         Initialization LSTM model.
@@ -19,10 +19,10 @@ class LSTM(nn.Block):
         # Initialize parameters
         self.x_dim = x_dim # Input
         self.h_dim = h_dim # Output dim
-        self.c_dim = c_dim # Hidden state dim
-        self.f_dim = f_dim # Forget gate dim
-        self.o_dim = o_dim
-        self.i_dim = i_dim
+        self.c_dim = h_dim
+        self.f_dim = h_dim
+        self.o_dim = h_dim
+        self.i_dim = h_dim
 
         # Weight initialization 
         # Only the output dim is specified, the input dim will be inferred at first use
@@ -45,11 +45,11 @@ class LSTM(nn.Block):
         """
         This method closely follows the formulas in RNN/lstm_formulas.png
         """
-        f_t = (self.W_f(X) + self.U_f(h)).sigmoid()
-        i_t = (self.W_i(X) + self.U_i(h)).sigmoid()
-        o_t = (self.W_o(X) + self.U_o(h)).sigmoid()
-        c_tilde_t = (self.W_c(X) + self.U_c(h)).sigmoid()
-        new_c = nd.multiply(f_t, c) + nd.multiply(i_t , c_tilde_t)
-        new_h = nd.multiply(o_t, c.sigmoid())
+        f_t             = (self.W_f(X) + self.U_f(h)).sigmoid()
+        i_t             = (self.W_i(X) + self.U_i(h)).sigmoid()
+        o_t             = (self.W_o(X) + self.U_o(h)).sigmoid()
+        c_tilde_t       = (self.W_c(X) + self.U_c(h)).sigmoid()
+        new_c           = nd.multiply(f_t, c) + nd.multiply(i_t , c_tilde_t)
+        new_h           = nd.multiply(o_t, c.sigmoid())
         return new_h, new_c
 

@@ -21,7 +21,7 @@ moves = nd.random_randint(low=0, high=2, shape=n_samples)
 move_one_hot = nd.array([[0,1] if m == 1 else [1,0] for m in moves])
 move_one_hot = nd.expand_dims(move_one_hot,0)
 
-model = mdn_rnn(input_dim = z_dim + move_dim, output_dim = z_dim)
+model = mdn_rnn(input_dim = z_dim + move_dim, interface_dim=128, output_dim = z_dim)
 model.initialize("xavier")
 
 trainer = MDN_RNN_trainer(0.01,k1=1,k2=10)

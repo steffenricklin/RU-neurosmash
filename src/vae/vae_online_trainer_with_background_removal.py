@@ -18,9 +18,7 @@ class Background_Trainer:
     def train(self, model, n_epochs, starting_rounds, batch_size = 1, plot_every=10):
         buffer = self.get_initial_buffer(starting_rounds)
         model.collect_params().initialize(mx.init.Xavier(), ctx=model.ctx)
-        trainer = gluon.Trainer(model.collect_params(), 'adam', {'learning_rate': .001})
-        end, reward, state = self.env.reset()
-
+        trainer = gluon.Trainer(model.collect_params(), 'adam', {'learning_rate': .0001})
         i = 0
         for e in range(n_epochs):
             print(f"Epoch {e}/{n_epochs}")

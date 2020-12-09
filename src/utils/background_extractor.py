@@ -35,9 +35,13 @@ class Background_Extractor:
         plt.show()
         pickle.dump(np.squeeze(mode),open(f"{image_dir}/background_{size}*{size}.p","wb"))
 
-    def get_background(self):
+    def get_background(self, oned = False):
         target_filename = f"{image_dir}/background_{size}*{size}.p"
         if not path.exists(target_filename):
             self.extract_and_save_background()
-        return pickle.load(open(target_filename,"rb"))
+        if oned:
+            return np.reshape(pickle.load(open(target_filename,"rb")),-1)
+        else:
+            return pickle.load(open(target_filename,"rb"))
+
 
