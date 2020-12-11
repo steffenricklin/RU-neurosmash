@@ -85,7 +85,7 @@ class World_Model:
 
     def rollout(self, r_rounds=1, prints=False):
         """
-        Runs a full round in Neurosmash. Cumulates the reward for each step and returns it.
+        Runs r_rounds in Neurosmash. Cumulates the reward for each round and returns it.
         :return: cumulative_reward
         """
         char_len_rounds = len(str(r_rounds))
@@ -102,8 +102,7 @@ class World_Model:
                 else:
                     z = self.vision.encode(state)
                 if isinstance(self.controller, Controller):
-                    a = self.controller.action(z,
-                                               h)  # TODO: debug, maybe merge with most recent controller branch / main
+                    a = self.controller.action(z, h)  # TODO: debug, maybe merge with most recent controller branch / main
                 else:
                     a = self.controller.step(end, reward, state)
                 end, reward, state = self.environment.step(a)
