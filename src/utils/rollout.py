@@ -83,6 +83,6 @@ if __name__ == '__main__':
     generator = RolloutGenerator(environment, rnn, vae)
     cumulative_reward = generator.rollout(controller)
     print(cumulative_reward)
-    es_trainer = ES_trainer(generator, 100, 10)
+    es_trainer = ES_trainer(generator, 20, 5)
     w, reward = es_trainer.train(n_iter=20)
     print(w, reward)
