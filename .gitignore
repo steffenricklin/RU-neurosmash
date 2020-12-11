@@ -130,3 +130,6 @@ dmypy.json
  
 myenv/
 
+# individual IntelliJ workspace settings
+.idea/
+.gitignore
