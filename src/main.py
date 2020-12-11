@@ -1,13 +1,8 @@
+import argparse
 from distutils.util import strtobool
 from settings import *
-from utils.rollout import set_up_env
-import torch
-import argparse
-import mxnet as mx
-
+from utils.utils import *
 from world_model.world_model import World_Model
-from utils.utils import get_ctx
-from utils.rollout import RolloutGenerator
 
 
 def run():
@@ -18,17 +13,11 @@ def run():
     args.ctx = get_ctx(args)
     world_model = World_Model(controller, environment, args)
 
-    # world_model.train(args)  # trains some of the modules if set so by args
-    print("rounds:", args.rounds)
-    cum_r = world_model.rollout(args.rounds)  # simulate one round in Neurosmash
+    world_model.train(args)  # trains some of the modules if set so by args
+
+    # simulate rounds in Neurosmash without training
+    cum_r = world_model.rollout(args.rounds)
     print("cumulative reward:", cum_r)
-
-    # generator = RolloutGenerator(world_model, agent, environment)
-    # generator.rollout(args)
-
-    # ToDo: save world_model (or not?)
-    if args.continue_training:
-        world_model.save_parameters(args)
 
 
 if __name__ == '__main__':
@@ -37,12 +26,13 @@ if __name__ == '__main__':
 
     parser.add_argument("--model_name", default="world_model")
     parser.add_argument("--save_model", default="world_model")
-    parser.add_argument("--load_model", default=False, type=lambda x: bool(strtobool(str(x))))
+    parser.add_argument("--load_model", default=True, type=lambda x: bool(strtobool(str(x))))
     parser.add_argument("--vision_model", default="classifier", help="vae | classifier")
     parser.add_argument("--vae_remove_background", default=True, type=lambda x: bool(strtobool(str(x))),
                         help="If vision_model is vae, the inputs background will be removed")
-    parser.add_argument("--use_controller", default=False, type=lambda x: bool(strtobool(str(x))))
-    parser.add_argument("--continue_training", default=True, type=lambda x: bool(strtobool(str(x))))
+    parser.add_argument("--use_controller", default=True, type=lambda x: bool(strtobool(str(x))))
+    parser.add_argument("--continue_training", default=False, type=lambda x: bool(strtobool(str(x))),
+                        help="Whether to train at all. Default is False to prevent overwriting well-performing modules")
     parser.add_argument("--train_vision", default=True, type=lambda x: bool(strtobool(str(x))))
     parser.add_argument("--train_rnn", default=True, type=lambda x: bool(strtobool(str(x))))
     parser.add_argument("--train_ctrl", default=True, type=lambda x: bool(strtobool(str(x))))

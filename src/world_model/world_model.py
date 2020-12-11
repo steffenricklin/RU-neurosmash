@@ -1,5 +1,4 @@
 import os.path
-import mxnet as mx
 import numpy as np
 from classifier.agent_location_classifier import Agent_Location_Classifier
 from vae.convvae import ConvVae
@@ -11,6 +10,7 @@ class World_Model:
     """Combines a vision model (vae or classifier),
     a mdn_rnn module and a controller module.
     """
+
     def __init__(self, controller, environment, args):
         """
 
@@ -23,7 +23,6 @@ class World_Model:
         self.vision = self.get_vision_model(args)
         self.rnn = mdn_rnn(input_dim=args.z_dim + args.move_dim, interface_dim=128, output_dim=args.z_dim)
         self.controller = controller
-        # self.controller = Controller()
 
         # load the parameters
         if bool(args.load_model):
@@ -40,6 +39,7 @@ class World_Model:
             vision = Agent_Location_Classifier()
         else:
             vision = ConvVae(args.batch_size, args.z_size)
+            # TODO: implement the option to remove_background as automatic input pre-processing step.
         return vision
 
     def load_parameters(self, args):
@@ -83,34 +83,49 @@ class World_Model:
         if isinstance(self.controller, Controller) and args.train_ctrl:  # if not using a random agent
             self.controller.save_parameters(args.path_to_ctrl_params)
 
-    def rollout(self, r_rounds=1):
+    def rollout(self, r_rounds=1, prints=False):
         """
         Runs a full round in Neurosmash. Cumulates the reward for each step and returns it.
         :return: cumulative_reward
         """
-        # environment, vae, rnn = self.environment, self.vae, self.rnn
-
-        l = len(str(r_rounds))
+        char_len_rounds = len(str(r_rounds))
         cumulative_reward = 0
         for r in range(r_rounds):
             end, reward, state = self.environment.reset()
-            print(f'Initial - end: {end}, reward: {reward}, len state: {len(state)}')
 
             h = np.zeros(self.h_dim)  # h = rnn.reset_state()
 
             while end == 0:
                 if isinstance(self.vision, Agent_Location_Classifier):
                     z = np.ones(self.z_dim)
-                    # z = self.vision.forward(state)  # TODO: debug the mxnet hybridize bug
+                    # z = self.vision.forward(state)  # TODO: debug the mxnet hybridize bug, or merge with most recent mdn-rnn branch / main
                 else:
                     z = self.vision.encode(state)
                 if isinstance(self.controller, Controller):
-                    a = self.controller.action(z, h)  # TODO:
+                    a = self.controller.action(z,
+                                               h)  # TODO: debug, maybe merge with most recent controller branch / main
                 else:
                     a = self.controller.step(end, reward, state)
                 end, reward, state = self.environment.step(a)
                 cumulative_reward += reward
                 # h = rnn.forward([a, z, h])
-            # print(f"Round {r+1:{l}}/{r_rounds} done.")
-        #
+            if prints:
+                print(f'Initial - end: {end}, reward: {reward}, len state: {len(state)}. '
+                      f'Round {r + 1:{char_len_rounds}}/{r_rounds}')
         return cumulative_reward
+
+    def train(self, args):
+        if args.continue_training:
+            if args.train_vision:
+                # TODO: add learning of the vision module
+                raise NotImplementedError
+
+            if args.train_rnn:
+                # TODO: add learning of the mdn_rnn module
+                raise NotImplementedError
+
+            if args.train_ctrl:
+                # TODO: add learning of the controller
+                raise NotImplementedError
+
+            self.save_parameters(args)
