@@ -39,7 +39,7 @@ class World_Model:
             vision = Agent_Location_Classifier()
         else:
             vision = ConvVae(args.batch_size, args.z_size)
-            # TODO: implement the option to remove_background as automatic input pre-processing step.
+            # TODO (optional): implement the option to remove_background as automatic input pre-processing step.
         return vision
 
     def load_parameters(self, args):
@@ -47,7 +47,7 @@ class World_Model:
 
         :param args:
         """
-        # ToDo: are all parameters loaded correctly like this?
+        # TODO everyone: are all parameters loaded correctly like this?
         # load vision module parameters
         if isinstance(self.vision, Agent_Location_Classifier):
             if os.path.exists(args.path_to_clf_params):
@@ -98,11 +98,11 @@ class World_Model:
             while end == 0:
                 if isinstance(self.vision, Agent_Location_Classifier):
                     z = np.ones(self.z_dim)
-                    # z = self.vision.forward(state)  # TODO: debug the mxnet hybridize bug, or merge with most recent mdn-rnn branch / main
+                    # z = self.vision.forward(state)  # TODO Stijn: debug the mxnet hybridize bug, or merge with most recent mdn-rnn branch / main
                 else:
                     z = self.vision.encode(state)
                 if isinstance(self.controller, Controller):
-                    a = self.controller.action(z, h)  # TODO: debug, maybe merge with most recent controller branch / main
+                    a = self.controller.action(z, h)  # TODO David/Daphen: debug, maybe merge with most recent controller branch / main
                 else:
                     a = self.controller.step(end, reward, state)
                 end, reward, state = self.environment.step(a)
@@ -116,15 +116,15 @@ class World_Model:
     def train(self, args):
         if args.continue_training:
             if args.train_vision:
-                # TODO: add learning of the vision module
+                # TODO Stijn: add learning of the vision module
                 raise NotImplementedError
 
             if args.train_rnn:
-                # TODO: add learning of the mdn_rnn module
+                # TODO Stijn: add learning of the mdn_rnn module
                 raise NotImplementedError
 
             if args.train_ctrl:
-                # TODO: add learning of the controller
+                # TODO David/Daphne: add learning of the controller
                 raise NotImplementedError
 
             self.save_parameters(args)

@@ -18,7 +18,7 @@ class Classifier_Trainer:
 
     def train(self,model,n_epochs, starting_rounds):
         buffer = self.get_initial_buffer(starting_rounds)
-        model.collect_params().initialize(mx.init.Xavier())  # TODO: if parameters are loaded, initialization is not needed?
+        model.collect_params().initialize(mx.init.Xavier())  # TODO Stijn: if parameters are loaded, initialization is not needed?
         trainer = gluon.Trainer(model.collect_params(), 'adam', {'learning_rate': .0001})
         i = 0
         # Do some loops

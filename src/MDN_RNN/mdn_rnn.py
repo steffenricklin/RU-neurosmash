@@ -27,7 +27,8 @@ class mdn_rnn(nn.Block):
         self.n_components = n_components
 
         # Initialize RNN and MDN
-        self.RNN = LSTM(x_dim=input_dim, h_dim=interface_dim)#, c_dim=self.hidden_state_dim)  # TODO: LSTM has no c_dim(?), probably not up-to-date with most current mdn-rnn branch
+        # TODO Stijn: LSTM() has no c_dim(?), probably not up-to-date with most current mdn-rnn branch
+        self.RNN = LSTM(x_dim=input_dim, h_dim=interface_dim)#, c_dim=self.hidden_state_dim)
         self.MDN = MDN(input_dim=self.interface_dim,  n_components=self.n_components, output_dim=self.output_dim)
 
     def forward(self, x, h, c):
