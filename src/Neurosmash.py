@@ -1,6 +1,7 @@
 import numpy as np
 import socket
 from PIL import Image
+from settings import *
 
 class Agent:
     def __init__(self):
@@ -13,7 +14,7 @@ class Agent:
         return   3 # random
 
 class Environment:
-    def __init__(self, ip = "127.0.0.1", port = 13000, size = 96, timescale = 5):
+    def __init__(self):
         self.client     = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.ip         = ip
         self.port       = port

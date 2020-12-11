@@ -24,9 +24,7 @@ class MDN(nn.Block):
 
         # Weights initialization
         with self.name_scope():
-
             self.linear_1 = nn.Dense(self.latent_1_dim, activation = "relu", use_bias=True)
-            self.linear_1.register_op_hook(lambda x: print(x), True)
             self.linear_2 = nn.Dense(self.latent_2_dim, activation = "relu", use_bias=True)
             self.linear_3 = nn.Dense(self.latent_3_dim, activation = "relu", use_bias=True)
             self.linear_4 = nn.Dense(self.z_dim, use_bias=True) # Final layer is purely linear to give flexibility in mu. Positivity of variance and mixture components is ensured by exponentiation
