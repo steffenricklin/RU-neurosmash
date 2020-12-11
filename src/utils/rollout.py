@@ -10,7 +10,7 @@ from vae.convvae import ConvVae
 from controller.ES_trainer import *
 
 
-def set_up_env():
+def set_up_env(*args):
     # Initialize agent and environment
 
     # This is an example agent.
