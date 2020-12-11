@@ -28,3 +28,6 @@ class Controller:
 
     def load_parameters(self, filepath):
         self.weights = pickle.load(filepath)
+
+    def save_parameters(self, filepath):
+        pickle.dump(self.weights, path_to_ctrl_params)

@@ -4,7 +4,7 @@ np.random.seed(2020)
 from multiprocessing import Pool
 from tqdm import tqdm
 import time
-from utils.rollout import RolloutGenerator
+# from utils.rollout import RolloutGenerator
 from controller.Controller import *
 
 

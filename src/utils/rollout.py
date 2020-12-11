@@ -1,29 +1,28 @@
 import mxnet as mx
-# !pip install tqdm
-
-# for Neurosmash
 import Neurosmash
-
 # our settings and models
 from MDN_RNN.mdn_rnn import mdn_rnn
 from vae.convvae import ConvVae
 from controller.ES_trainer import *
+from controller.Controller import Controller
 
 
-def set_up_env():
+def set_up_env(args):
     # Initialize agent and environment
 
-    # This is an example agent.
-    agent = Neurosmash.Agent()
+    controller = Neurosmash.Agent()  # This is an example agent.
+    if args.use_controller:
+        controller = Controller()
 
     # This is the main environment.
     try:
-        environment = Neurosmash.Environment()
+        environment = Neurosmash.Environment(args)
     except:
         print("Connecting to environment failed. Please make sure Neurosmash is running and check your settings.")
+        print(f"Settings from world model: ip={args.ip}, port={args.port}, size={args.size}, timescale={args.timescale}")
     else:
-        print("Connection to environment established successfully!")
-    return agent, environment
+        print("Successfully connected to Neurosmash!")
+        return controller, environment
 
 
 def get_models(ctx):
@@ -43,7 +42,8 @@ def get_models(ctx):
 
 
 class RolloutGenerator:
-
+    """ToDo: appears to be deprecated! Check whether still needed. Rollout can also be used in world_model
+    """
     def __init__(self, world_model, agent, environment):
         self.world_model = world_model
         self.environment = environment
@@ -74,14 +74,14 @@ class RolloutGenerator:
         return cumulative_reward
 
 
-if __name__ == '__main__':
-    ctx = mx.gpu() if mx.context.num_gpus() else mx.cpu()
-
-    agent, environment = set_up_env()
-    rnn, vae, controller = get_models(ctx)
-    generator = RolloutGenerator(environment, rnn, vae)
-    cumulative_reward = generator.rollout(controller)
-    print(cumulative_reward)
-    es_trainer = ES_trainer(generator, 100, 10)
-    w, reward = es_trainer.train(n_iter=20)
-    print(w, reward)
+# if __name__ == '__main__':
+#     ctx = mx.gpu() if mx.context.num_gpus() else mx.cpu()
+#
+#     agent, environment = set_up_env()
+#     rnn, vae, controller = get_models(ctx)
+#     generator = RolloutGenerator(environment, rnn, vae)
+#     cumulative_reward = generator.rollout(controller)
+#     print(cumulative_reward)
+#     es_trainer = ES_trainer(generator, 100, 10)
+#     w, reward = es_trainer.train(n_iter=20)
+#     print(w, reward)
