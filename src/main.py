@@ -14,7 +14,7 @@ def run():
     world_model.train(args)  # trains some of the modules if set so by args
 
     # simulate rounds in Neurosmash without training
-    cum_r = world_model.rollout(args.rounds)
+    cum_r = world_model.rollout(controller, args.rounds)
     print("cumulative reward:", cum_r)
 
 

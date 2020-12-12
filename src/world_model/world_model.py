@@ -4,6 +4,7 @@ from classifier.agent_location_classifier import Agent_Location_Classifier
 from vae.convvae import ConvVae
 from MDN_RNN.mdn_rnn import mdn_rnn
 from controller.Controller import Controller
+from controller.ES_trainer import ES_trainer
 
 
 class World_Model:
@@ -83,7 +84,7 @@ class World_Model:
         if isinstance(self.controller, Controller) and args.train_ctrl:  # if not using a random agent
             self.controller.save_parameters(args.path_to_ctrl_params)
 
-    def rollout(self, r_rounds=1, prints=False):
+    def rollout(self, controller, r_rounds=1, prints=False):
         """
         Runs r_rounds in Neurosmash. Cumulates the reward for each round and returns it.
         :return: cumulative_reward
@@ -92,7 +93,6 @@ class World_Model:
         cumulative_reward = 0
         for r in range(r_rounds):
             end, reward, state = self.environment.reset()
-
             h = np.zeros(self.h_dim)  # h = rnn.reset_state()
 
             while end == 0:
@@ -101,10 +101,11 @@ class World_Model:
                     # z = self.vision.forward(state)  # TODO Stijn: debug the mxnet hybridize bug, or merge with most recent mdn-rnn branch / main
                 else:
                     z = self.vision.encode(state)
-                if isinstance(self.controller, Controller):
-                    a = self.controller.action(z, h)  # TODO David/Daphen: debug, maybe merge with most recent controller branch / main
+
+                if isinstance(controller, Controller):
+                    a = controller.action(z, h)
                 else:
-                    a = self.controller.step(end, reward, state)
+                    a = controller.step(end, reward, state)
                 end, reward, state = self.environment.step(a)
                 cumulative_reward += reward
                 # h = rnn.forward([a, z, h])
@@ -124,6 +125,11 @@ class World_Model:
                 raise NotImplementedError
 
             if args.train_ctrl:
+                print('Start training: ')
+                es_trainer = ES_trainer(self.rollout, args.popsize, args.elitesize)
+                controller, reward = es_trainer.train(n_iter=args.ES_niter, parallel=args.ES_parallel_training)
+                print(f'Reward: {reward}')
+                print(f'Weights: {controller.weights}')
                 # TODO David/Daphne: add learning of the controller
                 raise NotImplementedError
 

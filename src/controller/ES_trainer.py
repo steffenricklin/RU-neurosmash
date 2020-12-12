@@ -3,12 +3,11 @@ np.random.seed(2020)
 from multiprocessing import Pool
 from tqdm import tqdm
 import time
-from utils.rollout import RolloutGenerator
 from controller.Controller import *
 
 class ES_trainer():
     
-    def __init__(self, rollout_generator, pop_size, elite_size):
+    def __init__(self, loss_function, pop_size, elite_size):
         """
         Gaussian Evolution Strategy algorithm (without covariances)
         :param pop_size   (float) population size
@@ -20,7 +19,7 @@ class ES_trainer():
         self.w_dim = z_dim + h_dim
         self.weights = np.random.normal(0,1,self.w_dim)
         self.sigma = 1
-        self.loss_func = rollout_generator.rollout
+        self.loss_func = loss_function
         
     def train(self, n_iter, parallel=False):
         """
@@ -47,8 +46,8 @@ class ES_trainer():
             # or sequential training
             else:
                 fitness = np.zeros(pop_size)
-                for i in range(pop_size):
-                    fitness[i] = self.loss_func(controllers[i])
+                for j in tqdm(range(pop_size)):
+                    fitness[j] = self.loss_func(controllers[j])
                 reward[i,:] = np.append(self.loss_func(Controller(w)), fitness)
 
             # Sort population and take elite            

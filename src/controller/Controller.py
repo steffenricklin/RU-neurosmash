@@ -18,8 +18,7 @@ class Controller():
         Computes a_t = W_c [z_t h_t] + b_t
         
         :todo biases are not yet included
-        :todo This should be four actions
-        
+
         :param z (vector) z_t: latent state at timepoint t + hidden state at timepoint t
         :param h (vector) h_t: hidden state at timepoint t
         :param theta (float) decision threshold for action

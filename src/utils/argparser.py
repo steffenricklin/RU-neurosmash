@@ -14,10 +14,10 @@ def get_args():
     parser.add_argument("--vae_remove_background", default=True, type=lambda x: bool(strtobool(str(x))),
                         help="If vision_model is vae, the inputs background will be removed")
     parser.add_argument("--use_controller", default=True, type=lambda x: bool(strtobool(str(x))))
-    parser.add_argument("--continue_training", default=False, type=lambda x: bool(strtobool(str(x))),
+    parser.add_argument("--continue_training", default=True, type=lambda x: bool(strtobool(str(x))),
                         help="Whether to train at all. Default is False to prevent overwriting well-performing modules")
-    parser.add_argument("--train_vision", default=True, type=lambda x: bool(strtobool(str(x))))
-    parser.add_argument("--train_rnn", default=True, type=lambda x: bool(strtobool(str(x))))
+    parser.add_argument("--train_vision", default=False, type=lambda x: bool(strtobool(str(x))))
+    parser.add_argument("--train_rnn", default=False, type=lambda x: bool(strtobool(str(x))))
     parser.add_argument("--train_ctrl", default=True, type=lambda x: bool(strtobool(str(x))))
 
     parser.add_argument("--z_dim", default=z_dim)
@@ -37,6 +37,10 @@ def get_args():
     parser.add_argument("--batch_size", default=40)
     parser.add_argument("--learning_rate", default=1e-3)
     parser.add_argument("--n_epochs", default=15)
+    parser.add_argument("--ES_parallel_training", default=False, type=lambda x: bool(strtobool(str(x))))
+    parser.add_argument("--ES_niter", default=100)
+    parser.add_argument("--popsize", default=42)
+    parser.add_argument("--elitesize", default=10)
     parser.add_argument("--train_split", default=0.9)
 
     # parameter paths
