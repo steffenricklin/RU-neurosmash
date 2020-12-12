@@ -5,7 +5,7 @@ from mxnet.gluon.nn import LeakyReLU
 from gluonts.mx.distribution.multivariate_gaussian import MultivariateGaussian
 from gluonts.mx.distribution.mixture import MixtureDistribution
 
-class MDN(nn.Block):
+class MDN(nn.HybridBlock):
     def __init__(self, input_dim, n_components, output_dim):
         super(MDN, self).__init__()        
         """
@@ -29,7 +29,7 @@ class MDN(nn.Block):
             self.linear_3 = nn.Dense(self.latent_3_dim, activation = "relu", use_bias=True)
             self.linear_4 = nn.Dense(self.z_dim, use_bias=True) # Final layer is purely linear to give flexibility in mu. Positivity of variance and mixture components is ensured by exponentiation
         
-    def forward(self, X):
+    def hybrid_forward(self,F, X, *args, **kwargs):
         # Perform neural network pass
         X = self.linear_1(X)
         X = self.linear_2(X)

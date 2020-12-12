@@ -41,6 +41,17 @@ def get_args():
     parser.add_argument("--popsize", default=42)
     parser.add_argument("--elitesize", default=10)
     parser.add_argument("--train_split", default=0.9)
+    parser.add_argument("--k1", default=1,type = lambda x: int(x))
+    parser.add_argument("--k2", default=10,type = lambda x: int(x))
+
+    parser.add_argument("--vision_init_rounds", default=5,type = lambda x: int(x))
+    parser.add_argument("--vision_epochs", default=10,type = lambda x: int(x))
+    parser.add_argument("--vision_batch_size", default=1,type = lambda x: int(x))
+    parser.add_argument("--vision_lr", default=0.001,type = lambda x: float(x))
+
+    parser.add_argument("--rnn_rounds", default=10,type = lambda x: int(x))
+    parser.add_argument("--rnn_lr", default=0.001,type = lambda x: float(x))
+
 
     # parameter paths
     parser.add_argument("--path_to_clf_params", default=path_to_clf_params)

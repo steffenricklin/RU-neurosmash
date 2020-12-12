@@ -8,26 +8,27 @@ import matplotlib.pyplot as plt
 # Create env
 
 class Classifier_Trainer:
-    def __init__(self, env):
+    def __init__(self, env, args):
+        self.args = args
         self.agent = Neurosmash.Agent()
         self.env = env
 
         # extract background
-        self.extr = BE.Background_Extractor(self.env, self.agent)
+        self.extr = BE.Background_Extractor(self.env, self.agent,args)
         self.background = self.extr.get_background(oned=True)
 
-    def train(self,model,n_epochs, starting_rounds):
-        buffer = self.get_initial_buffer(starting_rounds)
+    def train(self,model):
+        buffer = self.get_initial_buffer(self.args.vision_init_rounds)
         model.collect_params().initialize(mx.init.Xavier())  # TODO Stijn: if parameters are loaded, initialization is not needed?
-        trainer = gluon.Trainer(model.collect_params(), 'adam', {'learning_rate': .0001})
+        trainer = gluon.Trainer(model.collect_params(), 'adam', {'learning_rate': self.args.vision_lr})
         i = 0
         # Do some loops
-        for e in range(n_epochs):
-            print(f"epoch {e}/{n_epochs}")
+        for e in range(self.args.vision_epochs):
+            print(f"epoch {e}/{self.args.vision_epochs}")
             epoch_loss = 0
             for im in buffer:
                 # reshaped_state = nd.reshape(im, (3, size, size))
-                tensor = nd.array(nd.reshape(im, (1, 3, size, size)))
+                tensor = nd.array(nd.reshape(im, (1, 3, self.args.size, self.args.size)))
                 target = locate_agents(im)
                 with autograd.record():
                     out = model(tensor)
@@ -37,22 +38,22 @@ class Classifier_Trainer:
                 epoch_loss += loss
                 i+=1
                 if i%50 == 0:
-                    image = nd.array(nd.reshape(im,(size,size,3)))
+                    image = nd.array(nd.reshape(im,(self.args.size,self.args.size,3)))
                     self.plot_predictions(image, out)
 
     def test(self, model, rounds):
         data = self.get_single_buffer(rounds)[:rounds]
 
         for im in data:
-            tensor = nd.array(nd.reshape(im, (1,3, size, size)))
+            tensor = nd.array(nd.reshape(im, (1,3, self.args.size, self.args.size)))
             out = model(tensor)
-            image = nd.array(nd.reshape(im, (size, size, 3)))
+            image = nd.array(nd.reshape(im, (self.args.size, self.args.size, 3)))
             self.plot_predictions(image, out)
 
     def plot_predictions(self, image, out):
         result_im = image
         outn = out.asnumpy()[0]
-        rx, ry, bx, by = map(lambda x: int(x), outn * size)
+        rx, ry, bx, by = map(lambda x: int(x), outn * self.args.size)
         result_im[rx, ry] = [1, 0, 0]
         result_im[bx, by] = [0, 0, 1]
         plt.imshow(result_im.asnumpy())
@@ -109,8 +110,8 @@ class Classifier_Trainer:
 
     def plot_in_and_out(self, batch, out):
         fig, ax = plt.subplots(1, 2)
-        inp = batch[0].asnumpy().reshape((size, size, 3))
-        outp = out[0].asnumpy().reshape((size, size, 3))
+        inp = batch[0].asnumpy().reshape((self.args.size, self.args.size, 3))
+        outp = out[0].asnumpy().reshape((self.args.size, self.args.size, 3))
         ax[0].imshow(inp)
         ax[1].imshow(outp)
         plt.show()

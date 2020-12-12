@@ -1,7 +1,7 @@
 from mxnet import nd
 from mxnet.gluon import nn
 
-class LSTM(nn.Block):
+class LSTM(nn.HybridBlock):
     def __init__(self, x_dim, h_dim=5):
         super(LSTM, self).__init__()        
         """
@@ -41,10 +41,11 @@ class LSTM(nn.Block):
             self.W_c = nn.Dense(self.c_dim, in_units = self.x_dim,use_bias=True)
             self.U_c = nn.Dense(self.c_dim, in_units = self.h_dim,use_bias=False)
 
-    def forward(self, X, h, c):
+    def hybrid_forward(self, F, X, *args):
         """
         This method closely follows the formulas in RNN/lstm_formulas.png
         """
+        h, c = args[0], args[1]
         f_t             = (self.W_f(X) + self.U_f(h)).sigmoid()
         i_t             = (self.W_i(X) + self.U_i(h)).sigmoid()
         o_t             = (self.W_o(X) + self.U_o(h)).sigmoid()

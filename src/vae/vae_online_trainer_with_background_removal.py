@@ -9,28 +9,29 @@ import matplotlib.pyplot as plt
 
 class Background_Trainer:
 
-    def __init__(self, env):
+    def __init__(self, env, args):
+        self.args =  args
         self.agent = Neurosmash.Agent()
         self.env = env
-        extr = BE.Background_Extractor(self.env, self.agent)
+        extr = BE.Background_Extractor(self.env, self.agent,args)
         self.background = extr.get_background().reshape(-1)
 
-    def train(self, model, n_epochs, starting_rounds, batch_size = 1, plot_every=10):
-        buffer = self.get_initial_buffer(starting_rounds)
+    def train(self, model,  plot_every=10):
+        buffer = self.get_initial_buffer(self.args.vision_init_rounds)
         model.collect_params().initialize(mx.init.Xavier(), ctx=model.ctx)
         trainer = gluon.Trainer(model.collect_params(), 'adam', {'learning_rate': .0001})
         i = 0
-        for e in range(n_epochs):
-            print(f"Epoch {e}/{n_epochs}")
-            n_batches = int(len(buffer) / batch_size)
+        for e in range(self.args.vision_epochs):
+            print(f"Epoch {e}/{self.args.vision_epochs}")
+            n_batches = int(len(buffer) / self.args.vision_batch_size)
             for b in range(n_batches):
                 print(f"Batch {b}/{n_batches}")
-                batch = buffer[b*batch_size: (b+1)*batch_size]
-                batch_reshaped = nd.reshape(batch, (batch_size, 3, size, size))
+                batch = buffer[b*self.args.vision_batch_size: (b+1)*self.args.vision_batch_size]
+                batch_reshaped = nd.reshape(batch, (self.args.vision_batch_size, 3, size, size))
                 with autograd.record():
                     out, loss = model(batch_reshaped)
                 loss.backward()
-                trainer.step(batch_size)  # batch size = 1
+                trainer.step(self.args.vision_batch_size)  # batch size = 1
                 i+=1
                 # if i%plot_every == 0:
                 #     self.plot_in_and_out(batch, out)

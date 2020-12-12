@@ -10,6 +10,8 @@ from MDN_RNN.mdn_rnn import mdn_rnn
 from controller.Controller import Controller
 from controller.ES_trainer import ES_trainer
 from vae.vae_online_trainer_with_background_removal import Background_Trainer
+import utils.background_extractor as BE
+from mxnet import nd
 
 
 class World_Model:
@@ -22,13 +24,19 @@ class World_Model:
 
         :param args:
         """
+        self.args = args
         self.h_dim = args.h_dim
         self.z_dim = args.z_dim
 
         self.environment = environment
         self.vision = self.get_vision_model(args)
-        self.rnn = mdn_rnn(input_dim=args.z_dim + args.move_dim, interface_dim=128, output_dim=args.z_dim)
+        self.rnn = mdn_rnn(input_dim=args.z_dim + args.move_dim, interface_dim=128, output_dim=args.h_dim)
         self.controller = controller
+
+        # extract background
+        self.extr = BE.Background_Extractor(self.environment, Neurosmash.Agent(), args)
+        self.background = self.extr.get_background(oned=True)
+
 
         # load the parameters
         if bool(args.load_model):
@@ -98,25 +106,25 @@ class World_Model:
         cumulative_reward = 0
         for r in range(r_rounds):
             end, reward, state = self.environment.reset()
-            h = np.zeros(self.h_dim)  # h = rnn.reset_state()
-
+            eye = nd.eye(self.args.move_dim)
+            h,c = (nd.zeros((1, self.rnn.RNN.h_dim)),nd.zeros((1, self.rnn.RNN.c_dim)))
             while end == 0:
                 if isinstance(self.vision, Agent_Location_Classifier):
-                    z = np.ones(self.z_dim)
-                    # z = self.vision.forward(state)  # TODO Stijn: debug the mxnet hybridize bug, or merge with most recent mdn-rnn branch / main
+                    z = self.vision(self.extr.clean_and_reshape(state, self.args.size))
                 else:
-                    z = self.vision.encode(state)
-
-                # TODO Stijn: Use the MDN_RNN between the vision and the controller modules
-                # Keep a trailing 'action'
+                    z = self.vision(self.extr.clean_and_reshape(state, self.args.size))
 
                 if isinstance(controller, Controller):
-                    a = controller.action(z, h)
+                    a = controller.action(z.asnumpy(), h.asnumpy())
                 else:
                     a = controller.step(end, reward, state)
                 end, reward, state = self.environment.step(a)
                 cumulative_reward += reward
-                # h = rnn.forward([a, z, h])
+
+                action_onehot = eye[None,a]
+                rnn_input = nd.concatenate([z,action_onehot],1)
+                pz, h, c = self.rnn(rnn_input, h, c)
+
             if prints:
                 print(f'Initial - end: {end}, reward: {reward}, len state: {len(state)}. '
                       f'Round {r + 1:{char_len_rounds}}/{r_rounds}')
@@ -126,17 +134,15 @@ class World_Model:
         if args.continue_training:
             if args.train_vision:
                 if args.vision_model == "classifier":
-                    clf_trainer = Classifier_Trainer(self.environment)
-                    clf_trainer.train(self.vision, 2,1)  #TODO Stijn: put these parameters in the argparser
+                    clf_trainer = Classifier_Trainer(self.environment, args)
+                    clf_trainer.train(self.vision)
                 else:
-                    bckgrnd_trainer = Background_Trainer(self.environment)
-                    bckgrnd_trainer.train(self.vision, 2,1,1,10) #TODO Stijn: put these parameters in the argparser
+                    bckgrnd_trainer = Background_Trainer(self.environment, args)
+                    bckgrnd_trainer.train(self.vision)
 
             if args.train_rnn:
-                mdn_rnn_trainer = MDN_RNN_trainer(self.vision, self.environment, Neurosmash.Agent()) # TODO Stijn: Give this thing a controller if self has it
-                mdn_rnn_trainer.train(self.rnn,n_rounds = 100)
-                # TODO Stijn: add learning of the mdn_rnn module
-                raise NotImplementedError
+                mdn_rnn_trainer = MDN_RNN_trainer(self.vision, self.environment, args,Neurosmash.Agent()) # TODO Stijn: Give this thing a controller if self has it
+                mdn_losses = mdn_rnn_trainer.train(self.rnn)
 
             if args.train_ctrl:
                 print('Start training: ')
