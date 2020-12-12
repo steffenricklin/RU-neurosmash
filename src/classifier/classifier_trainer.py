@@ -8,9 +8,9 @@ import matplotlib.pyplot as plt
 # Create env
 
 class Classifier_Trainer:
-    def __init__(self):
+    def __init__(self, env):
         self.agent = Neurosmash.Agent()
-        self.env = Neurosmash.Environment()
+        self.env = env
 
         # extract background
         self.extr = BE.Background_Extractor(self.env, self.agent)
@@ -59,6 +59,7 @@ class Classifier_Trainer:
         plt.show()
 
     def get_single_buffer(self, max_images = 500):
+        print("Collecting images")
         buffer = nd.zeros((max_images, state_dim))
         end, reward, state = self.env.reset()
         buffered_images = 0
@@ -72,13 +73,13 @@ class Classifier_Trainer:
                 break
         return buffer[:buffered_images]
 
-
     def get_initial_buffer(self, n_init_rounds):
         """
         Returns a bunch of states with the bakground removed
         :param n_init_rounds:
         :return:
         """
+        print("Collecting images")
         max_images = 500*n_init_rounds
         buffer = nd.zeros((max_images, state_dim))
         end, reward, state = self.env.reset()

@@ -9,9 +9,9 @@ import matplotlib.pyplot as plt
 
 class Background_Trainer:
 
-    def __init__(self):
+    def __init__(self, env):
         self.agent = Neurosmash.Agent()
-        self.env =  Neurosmash.Environment()
+        self.env = env
         extr = BE.Background_Extractor(self.env, self.agent)
         self.background = extr.get_background().reshape(-1)
 
@@ -32,8 +32,8 @@ class Background_Trainer:
                 loss.backward()
                 trainer.step(batch_size)  # batch size = 1
                 i+=1
-                if i%plot_every == 0:
-                    self.plot_in_and_out(batch, out)
+                # if i%plot_every == 0:
+                #     self.plot_in_and_out(batch, out)
             buffer = self.update_buffer(buffer)
 
 

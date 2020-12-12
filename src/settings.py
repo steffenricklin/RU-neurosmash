@@ -11,7 +11,7 @@ path_to_ctrl_params = f"{param_dir}/controller.params"
 
 z_dim = 10
 h_dim = 10
-move_dim = 2
+move_dim = 3
 # RU-neurosmash environment settings
 ip = "127.0.0.1"  # Ip address that the TCP/IP interface listens to (127.0.0.1 by default)
 port = 13000  # Port number that the TCP/IP interface listens to (13000 by default)

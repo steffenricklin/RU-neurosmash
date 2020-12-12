@@ -2,6 +2,7 @@ from mxnet import nd, autograd,gluon
 import mxnet.gluon.nn as nn
 
 class Agent_Location_Classifier(gluon.Block):
+
     def __init__(self):
         super(Agent_Location_Classifier, self).__init__()
         with self.name_scope():

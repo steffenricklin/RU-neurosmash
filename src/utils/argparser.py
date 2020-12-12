@@ -2,7 +2,6 @@ import argparse
 from settings import *
 from distutils.util import strtobool
 
-
 def get_args():
     # collecting settings from arguments
     parser = argparse.ArgumentParser()
@@ -20,9 +19,9 @@ def get_args():
     parser.add_argument("--train_rnn", default=False, type=lambda x: bool(strtobool(str(x))))
     parser.add_argument("--train_ctrl", default=True, type=lambda x: bool(strtobool(str(x))))
 
-    parser.add_argument("--z_dim", default=z_dim)
-    parser.add_argument("--h_dim", default=h_dim)
-    parser.add_argument("--move_dim", default=move_dim)
+    parser.add_argument("--z_dim", default=z_dim, type = lambda x: int(x))
+    parser.add_argument("--h_dim", default=h_dim, type = lambda x: int(x))
+    parser.add_argument("--move_dim", default=move_dim, type = lambda x: int(x))
     parser.add_argument("--ip", default=ip,
                         help="Ip address that the TCP/IP interface listens to (127.0.0.1 by default)")
     parser.add_argument("--port", default=port,

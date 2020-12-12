@@ -1,10 +1,15 @@
 import os.path
 import numpy as np
+
+import Neurosmash
+from MDN_RNN.MDN_RNN_trainer import MDN_RNN_trainer
 from classifier.agent_location_classifier import Agent_Location_Classifier
+from classifier.classifier_trainer import Classifier_Trainer
 from vae.convvae import ConvVae
 from MDN_RNN.mdn_rnn import mdn_rnn
 from controller.Controller import Controller
 from controller.ES_trainer import ES_trainer
+from vae.vae_online_trainer_with_background_removal import Background_Trainer
 
 
 class World_Model:
@@ -102,6 +107,9 @@ class World_Model:
                 else:
                     z = self.vision.encode(state)
 
+                # TODO Stijn: Use the MDN_RNN between the vision and the controller modules
+                # Keep a trailing 'action'
+
                 if isinstance(controller, Controller):
                     a = controller.action(z, h)
                 else:
@@ -117,10 +125,16 @@ class World_Model:
     def train(self, args):
         if args.continue_training:
             if args.train_vision:
-                # TODO Stijn: add learning of the vision module
-                raise NotImplementedError
+                if args.vision_model == "classifier":
+                    clf_trainer = Classifier_Trainer(self.environment)
+                    clf_trainer.train(self.vision, 2,1)  #TODO Stijn: put these parameters in the argparser
+                else:
+                    bckgrnd_trainer = Background_Trainer(self.environment)
+                    bckgrnd_trainer.train(self.vision, 2,1,1,10) #TODO Stijn: put these parameters in the argparser
 
             if args.train_rnn:
+                mdn_rnn_trainer = MDN_RNN_trainer(self.vision, self.environment, Neurosmash.Agent()) # TODO Stijn: Give this thing a controller if self has it
+                mdn_rnn_trainer.train(self.rnn,n_rounds = 100)
                 # TODO Stijn: add learning of the mdn_rnn module
                 raise NotImplementedError
 
