@@ -30,7 +30,8 @@ class World_Model:
 
         self.environment = environment
         self.vision = self.get_vision_model(args)
-        self.rnn = mdn_rnn(input_dim=args.z_dim + args.move_dim, interface_dim=args.h_dim, output_dim=args.z_dim)
+        self.rnn = mdn_rnn(input_dim=args.z_dim + args.move_dim, interface_dim=args.h_dim, output_dim=args.z_dim) # TODO Stijn: fix this load params bug
+
         self.controller = controller
 
         # extract background

@@ -50,10 +50,6 @@ class MDN_RNN_trainer:
         trainer = gluon.Trainer(model.collect_params(), optim)
         losses = np.zeros((self.args.rnn_rounds, 500))
         for epo in range(self.args.rnn_rounds):
-            #TODO implement sampling tactic explained in 'World Models', last paragraph of section A.2, to avoid overfitting
-            # if epo > 0 & epo&print_every == 0:
-            #     print(f"epoch {epo}")
-
             input_data, output_data = self.get_single_rollout()
             observations = input_data.shape[0]-self.args.k2
             hidden_states = [(nd.zeros((1, model.RNN.h_dim)),nd.zeros((1, model.RNN.c_dim)))]
