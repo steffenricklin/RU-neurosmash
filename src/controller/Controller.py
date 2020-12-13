@@ -4,14 +4,12 @@ from settings import *
 
 class Controller():
 
-    def __init__(self, args, weights=None, n_actions = 3):
-        self.n_actions = n_actions
+    def __init__(self, args, weights=None):
 
         if weights is not None:
             self.weights = weights
         else:
-            print('making new weights')
-            self.weights = np.random.normal(0, 1, (n_actions, args.z_dim + args.h_dim))
+            self.weights = np.random.normal(0, 2, (move_dim, w_dim+1)) # last item is the bias
 
     def action(self, z, h, theta=0):
         """
@@ -27,25 +25,23 @@ class Controller():
         :return action (int) clipped with tanh()
         """
         S = np.append(z, h)
-        a = self.weights @ S #+ self.bias
+        weights, bias = self.weights[:,:-1], self.weights[:,-1]
+        a = weights @ S + bias
+
         a_exp = np.exp(a)
         a = a_exp/np.sum(a_exp)
         return a.argmax()
 
-    def get_weight_array(self):
-        """
-        :return: weights as a matrix of lenght h_dim + z_dim
-        """
-        return self.weights.flatten()
-
     def set_weight_array(self, weights):
         """:param weights (h_dim+z_dim,)
-        Reshapes the weights to a matrix form
+        Reshapes the weights to a matrix form (move_dim, w_dim+1)
         """
-        self.weights = weights.reshape(self.n_actions, int(len(weights)/4))
+        self.weights = weights.reshape(move_dim, int(len(weights)/move_dim))
+
+    def get_flattened_weights(self):
+        return self.weights.flatten()
 
     def save_parameters(self, path_to_ctrl_params):
-        print('made it here')
         np.save(path_to_ctrl_params, self.weights, allow_pickle=True)
 
     def load_parameters(self, path_to_ctrl_params):
