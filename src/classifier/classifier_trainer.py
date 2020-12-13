@@ -28,7 +28,7 @@ class Classifier_Trainer:
             for im in buffer:
                 # reshaped_state = nd.reshape(im, (3, size, size))
                 tensor = nd.array(nd.reshape(im, (1, 3, self.args.size, self.args.size)))
-                target = locate_agents(im)
+                target = locate_agents(im, self.args)
                 with autograd.record():
                     out = model(tensor)
                     loss = nd.sum(nd.square(out-target))
@@ -39,6 +39,7 @@ class Classifier_Trainer:
                 if i%50 == 0:
                     image = nd.array(nd.reshape(im,(self.args.size,self.args.size,3)))
                     self.plot_predictions(image, out)
+            buffer= self.update_buffer(buffer)
 
     def test(self, model, rounds):
         data = self.get_single_buffer(rounds)[:rounds]

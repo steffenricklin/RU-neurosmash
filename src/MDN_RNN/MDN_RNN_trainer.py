@@ -48,13 +48,13 @@ class MDN_RNN_trainer:
         retain_graph = self.args.k1<self.args.k2
         optim = optimizer.Adam(learning_rate=self.args.rnn_lr)
         trainer = gluon.Trainer(model.collect_params(), optim)
-        losses = np.zeros((self.args.rnn_rounds, 500))
+        # losses = np.zeros((self.args.rnn_rounds, 500))
         for epo in range(self.args.rnn_rounds):
             input_data, output_data = self.get_single_rollout()
             observations = input_data.shape[0]-self.args.k2
             hidden_states = [(nd.zeros((1, model.RNN.h_dim)),nd.zeros((1, model.RNN.c_dim)))]
 
-            epo_loss = nd.zeros(observations)
+            # epo_loss = nd.zeros(observations)
             for t in range(observations):
 
                 print(f"Epoch {epo},  timestep {t}")
@@ -88,11 +88,9 @@ class MDN_RNN_trainer:
                 neg_log_prob.backward(retain_graph = retain_graph)
 
                 trainer.step(1, ignore_stale_grad=False)
-                epo_loss[t] = neg_log_prob.detach().asnumpy()
-            pass
-            print("")
-            losses[epo,:observations] = epo_loss[:observations].asnumpy()
-        return losses
+                # epo_loss[t] = neg_log_prob.detach().asnumpy()
+            # losses[epo,:observations] = epo_loss[:observations].asnumpy()
+
 
     def get_single_rollout(self):
         """
