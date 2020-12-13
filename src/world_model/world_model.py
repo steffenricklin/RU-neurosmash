@@ -59,7 +59,6 @@ class World_Model:
 
     def load_parameters(self, args):
         """
-
         :param args:
         """
         # TODO everyone: are all parameters loaded correctly like this?
