@@ -4,6 +4,7 @@ from multiprocessing import Pool
 from tqdm import tqdm
 import time
 from controller.Controller import *
+import matplotlib.pyplot as plt
 
 class ES_trainer():
     
@@ -31,7 +32,7 @@ class ES_trainer():
         """
         pop_size, elite_size = self.pop_size, self.elite_size
         w, sigma  = self.weights, self.sigma
-        reward = np.zeros((n_iter, pop_size+1))
+        reward = np.zeros((n_iter, 4)) # score of i) mean weight ii) best performer iii) worst performer iv) sampled population average
  
         tic = time.perf_counter()
         for i in tqdm(range(n_iter)):
@@ -43,13 +44,14 @@ class ES_trainer():
             if parallel:
                 with Pool(os.cpu_count()) as pool:
                     fitness = pool.map(self.loss_func, controllers) # use starmap() for multiple argument functions.
-                reward[i,:] = np.append(self.loss_func(Controller(self.args, w)), fitness) # First entry is of mean weights, after that of pop. members
+                reward[i] = self.get_reward_stats(w, fitness)
+
             # or sequential training
             else:
                 fitness = np.zeros(pop_size)
                 for j in tqdm(range(pop_size)):
                     fitness[j] = self.loss_func(controllers[j])
-                reward[i,:] = np.append(self.loss_func(Controller(self.args,w)), fitness)
+                reward[i] = self.get_reward_stats(w, fitness)
 
             # Sort population and take elite            
             elite_idx  = np.argsort(fitness)[:elite_size]
@@ -66,4 +68,32 @@ class ES_trainer():
         self.weights = w
         self.sigma = sigma
         return Controller(self.args, w), reward
+
+    def plot_results(self, reward):
+        plt.figure(figsize=(8,5))
+        plt.title(f'Cumulative reward of as a function generations')
+        plt.xlabel('Generation')
+        plt.ylabel('Cumulative reward')
+
+        # mean population
+        plt.plot(np.arange(reward.shape[0]), reward[:,0], label="Population solution")
+        # best performer
+        plt.plot(np.arange(reward.shape[0]), reward[:,1], label="Best performer")
+        # Worst performer
+        plt.plot(np.arange(reward.shape[0]), reward[:,2], label="Worst performer")
+        # sampled population average
+        plt.plot(np.arange(reward.shape[0]), reward[:,3], label="Sampled population reward")
+
+        plt.legend()
+        plt.savefig('data/images/ControllerResults/controller_training.pdf', dpi=200)
+        plt.show()
+
+    def get_reward_stats(self, w, fitness):
+        reward = np.zeros(4)
+        reward[0] = self.loss_func(Controller(self.args, w))  # First entry is of mean weights, after that of pop. members
+        reward[1] = np.max(fitness)  # best performer
+        reward[2] = np.min(fitness)  # worst performer
+        reward[3] = np.mean(fitness)  # sampled population mean
+        return reward
+
     

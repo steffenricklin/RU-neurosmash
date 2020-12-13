@@ -153,9 +153,7 @@ class World_Model:
                 print('Start training: ')
                 es_trainer = ES_trainer(self.rollout, args.popsize, args.elitesize, args)
                 controller, reward = es_trainer.train(n_iter=args.ES_niter, parallel=args.ES_parallel_training)
-                print(f'Reward: {reward}')
-                print(f'Weights: {controller.weights}')
-                # TODO David/Daphne: add learning of the controller
-                raise NotImplementedError
+                self.controller = controller
+                es_trainer.plot_results(reward)
 
             self.save_parameters(args)
