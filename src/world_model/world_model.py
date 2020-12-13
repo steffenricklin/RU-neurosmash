@@ -88,6 +88,7 @@ class World_Model:
         # load controller parameters
         if not args.train_ctrl:
             if isinstance(self.controller, Controller):  # if not using a random agent
+                print('Loaded controller parameters')
                 if os.path.exists(args.path_to_ctrl_params):
                     self.controller.load_parameters(args.path_to_ctrl_params)
                 else:
