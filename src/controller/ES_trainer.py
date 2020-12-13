@@ -4,25 +4,24 @@ from multiprocessing import Pool
 from tqdm import tqdm
 import time
 from controller.Controller import *
-import matplotlib.pyplot as plt
+from settings import *
+from controller.ES_abstract import ES_abstract
 
-class ES_trainer():
+class ES_trainer(ES_abstract):
     
     def __init__(self, loss_function, pop_size, elite_size, args):
         """
         Gaussian Evolution Strategy algorithm (without covariances)
+        :param loss_function (function) rollout of the Neurosmash environment, function to be optimized
         :param pop_size   (float) population size
         :param elite_size (float) elite group size
-        :param w_dim      (int) shape of weights to be optimized
+        :param args
         """
-        self.args = args
+        super().__init__(loss_function, pop_size, args)
         self.elite_size = elite_size
-        self.pop_size = pop_size
-        self.w_dim = z_dim + h_dim
-        self.weights = np.random.normal(0,1,self.w_dim)
+        self.weights = np.random.normal(0,1,self.dim)
         self.sigma = 1
-        self.loss_func = loss_function
-        
+
     def train(self, n_iter, parallel=False):
         """
         :param n_iter    (int) number of iterations
@@ -37,9 +36,10 @@ class ES_trainer():
         tic = time.perf_counter()
         for i in tqdm(range(n_iter)):
             # Generate K population members
-            population = np.random.multivariate_normal(mean=w, cov=sigma*np.eye(self.w_dim), size=pop_size)
-            controllers = [Controller(self.args, weights) for weights in population]
-            
+            population = np.random.multivariate_normal(mean=w, cov=sigma*np.eye(self.dim), size=pop_size)
+            controllers = [Controller(self.args) for i in range(pop_size)]
+            for c, w in zip(controllers, population):
+                c.set_weight_array(w)
             # Multiprocess each population member
             if parallel:
                 with Pool(os.cpu_count()) as pool:
@@ -68,32 +68,3 @@ class ES_trainer():
         self.weights = w
         self.sigma = sigma
         return Controller(self.args, w), reward
-
-    def plot_results(self, reward):
-        plt.figure(figsize=(8,5))
-        plt.title(f'Cumulative reward of as a function generations')
-        plt.xlabel('Generation')
-        plt.ylabel('Cumulative reward')
-
-        # mean population
-        plt.plot(np.arange(reward.shape[0]), reward[:,0], label="Population solution")
-        # best performer
-        plt.plot(np.arange(reward.shape[0]), reward[:,1], label="Best performer")
-        # Worst performer
-        plt.plot(np.arange(reward.shape[0]), reward[:,2], label="Worst performer")
-        # sampled population average
-        plt.plot(np.arange(reward.shape[0]), reward[:,3], label="Sampled population reward")
-
-        plt.legend()
-        plt.savefig('data/images/ControllerResults/controller_training.pdf', dpi=200)
-        plt.show()
-
-    def get_reward_stats(self, w, fitness):
-        reward = np.zeros(4)
-        reward[0] = self.loss_func(Controller(self.args, w))  # First entry is of mean weights, after that of pop. members
-        reward[1] = np.max(fitness)  # best performer
-        reward[2] = np.min(fitness)  # worst performer
-        reward[3] = np.mean(fitness)  # sampled population mean
-        return reward
-
-    

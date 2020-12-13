@@ -9,6 +9,7 @@ from vae.convvae import ConvVae
 from MDN_RNN.mdn_rnn import mdn_rnn
 from controller.Controller import Controller
 from controller.ES_trainer import ES_trainer
+from controller.NES_trainer import NES_trainer
 from vae.vae_online_trainer_with_background_removal import Background_Trainer
 import utils.background_extractor as BE
 from mxnet import nd
@@ -155,7 +156,10 @@ class World_Model:
 
             if args.train_ctrl:
                 print('Start training: ')
-                es_trainer = ES_trainer(self.rollout, args.popsize, args.elitesize, args)
+                if args.use_NES:
+                    es_trainer = NES_trainer(self.rollout, args.popsize, args.elitesize, args)
+                else:
+                    es_trainer = ES_trainer(self.rollout, args.popsize, args.elitesize, args)
                 controller, reward = es_trainer.train(n_iter=args.ES_niter, parallel=args.ES_parallel_training)
                 self.controller = controller
                 es_trainer.plot_results(reward)
