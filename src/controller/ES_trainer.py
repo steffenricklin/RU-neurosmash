@@ -39,8 +39,9 @@ class ES_trainer(ES_abstract):
         for i in tqdm(range(n_iter)):
             # Generate K population members
             population = np.random.multivariate_normal(mean=w, cov=sigma*np.eye(self.dim), size=pop_size)
-            controllers = [Controller(self.args).set_weight_array(w) for w in population]
-
+            controllers = [Controller(self.args) for w in population]
+            for c,w in zip(controllers,population):
+                c.set_weight_array(w)
             # Multiprocess each population member
             if parallel:
                 with Pool(os.cpu_count()) as pool:
@@ -68,4 +69,6 @@ class ES_trainer(ES_abstract):
         
         self.weights = w
         self.sigma = sigma
-        return Controller(self.args).set_weight_array(w), reward
+        trained_controller = Controller(self.args)
+        trained_controller.set_weight_array(w)
+        return trained_controller, reward

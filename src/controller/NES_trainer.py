@@ -6,11 +6,11 @@ import time
 from controller.Controller import *
 from settings import *
 from controller.ES_trainer import ES_abstract
-
+from scipy import stats
 
 class NES_trainer(ES_abstract):
 
-    def __init__(self, loss_function, pop_size, args, p_theta, learn_rate):
+    def __init__(self, loss_function, pop_size, learn_rate, args):
         """
         Natural Evolution Strategy algorithm
         :param loss_function (function) rollout of the Neurosmash environment, function to be optimized
@@ -23,10 +23,11 @@ class NES_trainer(ES_abstract):
         super().__init__(loss_function, pop_size, args)
         self.weights = np.random.normal(0, 1, self.dim) # weights = mu
         self.cov_matrix = np.eye(self.dim)
-        #self.theta =
+        sigma_values = np.triu(self.cov_matrix)[np.triu_indices(self.dim)]
+        self.theta = np.append(self.weights, sigma_values)
         self.grad = self.grad_log_mvn_pdf
         self.learn_rate = learn_rate
-        self.p_theta = p_theta
+        self.p_theta = lambda theta: stats.multivariate_normal(mean=self.get_mu(theta).flatten(), cov=self.get_Sigma(theta))
 
 
     def train(self, n_iter, parallel=False):
@@ -39,7 +40,7 @@ class NES_trainer(ES_abstract):
         :return fitness  (matrix) fitness score for each member for each iteration
         '''
         pop_size, learn_rate = self.pop_size, self.learn_rate
-        p_theta, w = self.p_theta, self.weights
+        p_theta, theta = self.p_theta, self.theta
         grad = self.grad
 
         reward = np.zeros((n_iter,4))  # score of i) mean weight ii) best performer iii) worst performer iv) sampled population average
@@ -58,11 +59,12 @@ class NES_trainer(ES_abstract):
             fitness = np.zeros(pop_size)
             for j in tqdm(range(pop_size)):
                 x = np.reshape(cur_p_theta.rvs(), (self.dim, 1))
-                controller = Controller(self.args, weights=x)
+                controller = Controller(self.args)
+                controller.set_weight_array(x)
                 fitness[j] = self.loss_func(controller)
                 log_der = np.reshape(cur_grad(x), (len(theta), 1))
-                grad_J += fitness * log_der / pop_size
-                F += log_der @ log_der.T / pop_size
+                grad_J += fitness[j] * log_der / pop_size
+                F += log_der.T @ log_der / pop_size
 
             theta += learn_rate * (np.linalg.inv(F) @ grad_J).flatten()
             reward[i] = self.get_reward_stats(theta[:self.dim], fitness)
@@ -71,7 +73,11 @@ class NES_trainer(ES_abstract):
         print(f'Duration of training the controller: {toc - tic:0.4f} seconds')
 
         self.theta = theta
-        return Controller(self.args).set_weight_array(self.get_mu(theta)), reward
+        self.weights = self.get_mu(theta)
+        self.cov_matrix = self.get_Sigma(theta)
+        trained_controller = Controller(self.args)
+        trained_controller.set_weight_array(self.weights)
+        return trained_controller, reward
 
 
     def grad_log_mvn_pdf(self, theta):
@@ -82,16 +88,20 @@ class NES_trainer(ES_abstract):
         mu = self.get_mu(theta)
         mu_grad = lambda x: Sigma_inv @ (x - mu)
         Sigma_grad = lambda x: 0.5 * (Sigma_inv @ (x - mu) @ (x - mu).T @ Sigma_inv - Sigma_inv)
-        return lambda x: np.concatenate([mu_grad(x).flatten(), Sigma_grad(x).flatten()[[0, 1, 3]]]) ## todo: 0,1,3???
+        idx_matrix = np.arange(1, (self.dim * self.dim) + 1).reshape((self.dim, self.dim))
+        idx = np.triu(idx_matrix).flatten()
+        idx = idx[idx > 0] - 1
+
+        return lambda x: np.concatenate([mu_grad(x).flatten(), Sigma_grad(x).flatten()[idx]])
 
     def get_mu(self, theta):
         return np.reshape(theta[:self.dim], (self.dim, 1))
 
     def get_Sigma(self, theta):
-        Sigma = np.zeros(self.dim)
-        for i in range(self.dim):
-            for j in range(self.dim):
-                Sigma[i,i] = theta
-        return #2x2:  np.array([[1,2],[2,3]])
-    # 3x3: np.array([[1,2,3],[2,4,5],[]])
+        Sigma_values = theta[self.dim:]
+        Sigma = np.zeros((self.dim,self.dim))
+        ind_u = np.triu_indices(self.dim)
+        Sigma[ind_u] = Sigma_values
+        Sigma = Sigma + Sigma.transpose() - np.diag(np.diag(Sigma))
+        return Sigma
 
