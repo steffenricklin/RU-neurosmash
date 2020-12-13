@@ -25,6 +25,8 @@ class ES_trainer(ES_abstract):
     def train(self, n_iter, parallel=False):
         """
         :param n_iter    (int) number of iterations
+        :param parallel (bool) If true, run the Neurosmash environment in parallel
+
 
         :return trained controller (Controller) trained controller object with trained weights
         :return fitness  (matrix) fitness score for each member for each iteration
@@ -37,9 +39,8 @@ class ES_trainer(ES_abstract):
         for i in tqdm(range(n_iter)):
             # Generate K population members
             population = np.random.multivariate_normal(mean=w, cov=sigma*np.eye(self.dim), size=pop_size)
-            controllers = [Controller(self.args) for i in range(pop_size)]
-            for c, w in zip(controllers, population):
-                c.set_weight_array(w)
+            controllers = [Controller(self.args).set_weight_array(w) for w in population]
+
             # Multiprocess each population member
             if parallel:
                 with Pool(os.cpu_count()) as pool:
@@ -67,4 +68,4 @@ class ES_trainer(ES_abstract):
         
         self.weights = w
         self.sigma = sigma
-        return Controller(self.args, w), reward
+        return Controller(self.args).set_weight_array(w), reward
