@@ -27,7 +27,7 @@ class Controller():
         """
         S = np.append(z, h)
         a = self.weights @ S #+ self.bias
-        a = np.exp(a)/np.exp(a)
+        a = np.exp(a)/np.exp(np.sum(a))
         return a.argmax()
 
     def get_weight_array(self):
