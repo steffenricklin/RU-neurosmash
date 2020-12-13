@@ -52,7 +52,6 @@ def get_args():
     parser.add_argument("--rnn_rounds", default=10,type = lambda x: int(x))
     parser.add_argument("--rnn_lr", default=0.001,type = lambda x: float(x))
 
-
     # parameter paths
     parser.add_argument("--path_to_clf_params", default=path_to_clf_params)
     parser.add_argument("--path_to_rnn_params", default=path_to_rnn_params)

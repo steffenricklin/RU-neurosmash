@@ -16,6 +16,6 @@ move_dim = 3
 ip = "127.0.0.1"  # Ip address that the TCP/IP interface listens to (127.0.0.1 by default)
 port = 13000  # Port number that the TCP/IP interface listens to (13000 by default)
 size = 64  # This is the size of the texture that the environment is rendered.
-timescale = 1  # This is the simulation speed of the environment.
+timescale = 5  # This is the simulation speed of the environment.
 state_dim = size*size*3
 # model parameter settings
