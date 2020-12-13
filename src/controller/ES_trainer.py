@@ -7,13 +7,14 @@ from controller.Controller import *
 
 class ES_trainer():
     
-    def __init__(self, loss_function, pop_size, elite_size):
+    def __init__(self, loss_function, pop_size, elite_size, args):
         """
         Gaussian Evolution Strategy algorithm (without covariances)
         :param pop_size   (float) population size
         :param elite_size (float) elite group size
         :param w_dim      (int) shape of weights to be optimized
         """
+        self.args = args
         self.elite_size = elite_size
         self.pop_size = pop_size
         self.w_dim = z_dim + h_dim
@@ -36,19 +37,19 @@ class ES_trainer():
         for i in tqdm(range(n_iter)):
             # Generate K population members
             population = np.random.multivariate_normal(mean=w, cov=sigma*np.eye(self.w_dim), size=pop_size)
-            controllers = [Controller(weights) for weights in population]
+            controllers = [Controller(self.args, weights) for weights in population]
             
             # Multiprocess each population member
             if parallel:
                 with Pool(os.cpu_count()) as pool:
                     fitness = pool.map(self.loss_func, controllers) # use starmap() for multiple argument functions.
-                reward[i,:] = np.append(self.loss_func(Controller(w)), fitness) # First entry is of mean weights, after that of pop. members
+                reward[i,:] = np.append(self.loss_func(Controller(self.args, w)), fitness) # First entry is of mean weights, after that of pop. members
             # or sequential training
             else:
                 fitness = np.zeros(pop_size)
                 for j in tqdm(range(pop_size)):
                     fitness[j] = self.loss_func(controllers[j])
-                reward[i,:] = np.append(self.loss_func(Controller(w)), fitness)
+                reward[i,:] = np.append(self.loss_func(Controller(self.args,w)), fitness)
 
             # Sort population and take elite            
             elite_idx  = np.argsort(fitness)[:elite_size]
@@ -64,5 +65,5 @@ class ES_trainer():
         
         self.weights = w
         self.sigma = sigma
-        return Controller(w), reward
+        return Controller(self.args, w), reward
     

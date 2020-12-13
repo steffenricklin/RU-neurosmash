@@ -30,7 +30,7 @@ class World_Model:
 
         self.environment = environment
         self.vision = self.get_vision_model(args)
-        self.rnn = mdn_rnn(input_dim=args.z_dim + args.move_dim, interface_dim=128, output_dim=args.h_dim)
+        self.rnn = mdn_rnn(input_dim=args.z_dim + args.move_dim, interface_dim=args.h_dim, output_dim=args.z_dim)
         self.controller = controller
 
         # extract background
@@ -106,21 +106,26 @@ class World_Model:
         cumulative_reward = 0
         for r in range(r_rounds):
             end, reward, state = self.environment.reset()
+
+            # Get an eye for one-hot encoding
             eye = nd.eye(self.args.move_dim)
+            # Initialize hidden states for RNN
             h,c = (nd.zeros((1, self.rnn.RNN.h_dim)),nd.zeros((1, self.rnn.RNN.c_dim)))
             while end == 0:
-                if isinstance(self.vision, Agent_Location_Classifier):
-                    z = self.vision(self.extr.clean_and_reshape(state, self.args.size))
-                else:
-                    z = self.vision(self.extr.clean_and_reshape(state, self.args.size))
+                # Get latent representation from LSTM
+                z = self.vision(self.extr.clean_and_reshape(state, self.args.size))
 
+                # Compute the best step with the controller
                 if isinstance(controller, Controller):
                     a = controller.action(z.asnumpy(), h.asnumpy())
                 else:
                     a = controller.step(end, reward, state)
+
+                # Take the step and store the reward
                 end, reward, state = self.environment.step(a)
                 cumulative_reward += reward
 
+                # Get the new hidden states by feeding the RNN the previous state and the action
                 action_onehot = eye[None,a]
                 rnn_input = nd.concatenate([z,action_onehot],1)
                 pz, h, c = self.rnn(rnn_input, h, c)
@@ -146,7 +151,7 @@ class World_Model:
 
             if args.train_ctrl:
                 print('Start training: ')
-                es_trainer = ES_trainer(self.rollout, args.popsize, args.elitesize)
+                es_trainer = ES_trainer(self.rollout, args.popsize, args.elitesize, args)
                 controller, reward = es_trainer.train(n_iter=args.ES_niter, parallel=args.ES_parallel_training)
                 print(f'Reward: {reward}')
                 print(f'Weights: {controller.weights}')

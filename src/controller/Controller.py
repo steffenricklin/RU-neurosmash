@@ -4,13 +4,13 @@ from settings import *
 
 class Controller():
 
-    def __init__(self, weights=None, n_actions = 3):
+    def __init__(self, args, weights=None, n_actions = 3):
         self.n_actions = n_actions
 
         if weights is not None:
             self.weights = weights
         else:
-            self.weights = np.random.normal(0, 1, (n_actions, z_dim + h_dim))
+            self.weights = np.random.normal(0, 1, (n_actions, args.z_dim + args.h_dim))
 
     def action(self, z, h, theta=0):
         """

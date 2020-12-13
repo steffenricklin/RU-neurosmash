@@ -9,7 +9,7 @@ path_to_vae_params = f"{param_dir}/vae.params"
 path_to_clf_params = f"{param_dir}/clf.params"
 path_to_ctrl_params = f"{param_dir}/controller.params"
 
-z_dim = 10
+z_dim = 4
 h_dim = 10
 move_dim = 3
 # RU-neurosmash environment settings

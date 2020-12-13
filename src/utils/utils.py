@@ -21,7 +21,7 @@ def set_up_env(args):
 
     controller = Neurosmash.Agent()  # This is an example agent.
     if args.use_controller:
-        controller = Controller()
+        controller = Controller(args)
 
     # This is the main environment.
     try:
