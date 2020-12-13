@@ -12,7 +12,7 @@ from controller.ES_trainer import ES_trainer
 from vae.vae_online_trainer_with_background_removal import Background_Trainer
 import utils.background_extractor as BE
 from mxnet import nd
-
+import mxnet as mx
 
 class World_Model:
     """Combines a vision model (vae or classifier),
@@ -74,14 +74,16 @@ class World_Model:
                     self.vision.load_parameters(args.path_to_vae_params, args.ctx)
                 else:
                     print(f"Could not find {args.path_to_vae_params}")
-
+        else:
+            self.vision.collect_params().initialize(mx.init.Xavier())
         # load mdn_rnn parameters
         if not args.train_rnn:
             if os.path.exists(args.path_to_rnn_params):
                 self.rnn.load_parameters(args.path_to_rnn_params, args.ctx)
             else:
                 print(f"Could not find {args.path_to_rnn_params}")
-
+        else:
+            self.rnn.collect_params().initialize(mx.init.Xavier())
         # load controller parameters
         if not args.train_ctrl:
             if isinstance(self.controller, Controller):  # if not using a random agent
