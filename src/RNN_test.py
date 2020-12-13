@@ -43,7 +43,6 @@ while end == 0:    # Get latent representation from LSTM
 
     pred = pz.sample(1)
 
-    one_d_without_background = np.where(state ==background, 10, state)
     # Plot actual position and predicted position
     [pxr, pyr, pxb, pyb] = map(lambda x: min(args.size-1,int(x*args.size)), list(prev_pred[0].asnumpy()))
     [xr, yr, xb, yb] = map(int,locate_agents(nd.array(one_d_without_background),args).asnumpy()*args.size)

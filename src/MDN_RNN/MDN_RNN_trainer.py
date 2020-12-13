@@ -4,6 +4,7 @@ import utils.background_extractor as BE
 import Neurosmash
 from MDN_RNN.mdn_rnn import * 
 import numpy as np
+import gc
 
 class MDN_RNN_trainer:
     """
@@ -53,7 +54,7 @@ class MDN_RNN_trainer:
             input_data, output_data = self.get_single_rollout()
             observations = input_data.shape[0]-self.args.k2
             hidden_states = [(nd.zeros((1, model.RNN.h_dim)),nd.zeros((1, model.RNN.c_dim)))]
-
+            gc.collect()
             # epo_loss = nd.zeros(observations)
             for t in range(observations):
 
@@ -107,11 +108,10 @@ class MDN_RNN_trainer:
 
         # Prepare environment
         end, reward, state = self.env.reset()
-        cleanstate = np.where(state == self.background, 10, state)/255
+        state_mx = self.extr.clean_and_reshape(state)/255
 
         while end == 0:
             # Get latent representation
-            state_mx = nd.reshape(nd.array(cleanstate), (1, 3, self.args.size, self.args.size))
             latent = self.vision(state_mx)
 
             # Store latent as output from previous step
@@ -135,6 +135,6 @@ class MDN_RNN_trainer:
 
             # Go to next state
             end, _, state = self.env.step(action)
-            cleanstate = np.where(state == self.background, 10, state)/255
+            state_mx = self.extr.clean_and_reshape(state)/255
 
         return input_buffer[:buffered_samples-1], output_buffer[:buffered_samples-1]
