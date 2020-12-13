@@ -39,11 +39,9 @@ class World_Model:
         self.background = self.extr.get_background(oned=True)
 
 
-        # load the parameters
-        if bool(args.load_model):
-            self.load_parameters(args)
-        else:
-            self.rnn.initialize("xavier")
+        # If models are pre-trained, load the params, otherwise, train them
+        self.load_parameters(args)
+
 
     def get_vision_model(self, args):
         """
@@ -59,32 +57,38 @@ class World_Model:
 
     def load_parameters(self, args):
         """
+        Loads the pre-trained parameters if the components do not need to be trained. If any component needs to be trained,
+        it ignores any pre-trained parameters and will train a new model.
         :param args:
+
         """
-        # TODO everyone: are all parameters loaded correctly like this?
         # load vision module parameters
-        if isinstance(self.vision, Agent_Location_Classifier):
-            if os.path.exists(args.path_to_clf_params):
-                self.vision.load_parameters(args.path_to_clf_params, args.ctx)
+        if not args.train_vision:
+            if isinstance(self.vision, Agent_Location_Classifier):
+                if os.path.exists(args.path_to_clf_params):
+                    self.vision.load_parameters(args.path_to_clf_params, args.ctx)
+                else:
+                    print(f"Could not find {args.path_to_clf_params}")
             else:
-                print(f"Could not find {args.path_to_clf_params}")
-        else:
-            if os.path.exists(args.path_to_vae_params):
-                self.vision.load_parameters(args.path_to_vae_params, args.ctx)
-            else:
-                print(f"Could not find {args.path_to_vae_params}")
+                if os.path.exists(args.path_to_vae_params):
+                    self.vision.load_parameters(args.path_to_vae_params, args.ctx)
+                else:
+                    print(f"Could not find {args.path_to_vae_params}")
 
         # load mdn_rnn parameters
-        if os.path.exists(args.path_to_rnn_params):
-            self.rnn.load_parameters(args.path_to_rnn_params, args.ctx)
-        else:
-            print(f"Could not find {args.path_to_rnn_params}")
-        # load controller parameters
-        if isinstance(self.controller, Controller):  # if not using a random agent
-            if os.path.exists(args.path_to_ctrl_params):
-                self.controller.load_parameters(args.path_to_ctrl_params)
+        if not args.train_rnn:
+            if os.path.exists(args.path_to_rnn_params):
+                self.rnn.load_parameters(args.path_to_rnn_params, args.ctx)
             else:
-                print(f"Could not find {args.path_to_ctrl_params}")
+                print(f"Could not find {args.path_to_rnn_params}")
+
+        # load controller parameters
+        if not args.train_ctrl:
+            if isinstance(self.controller, Controller):  # if not using a random agent
+                if os.path.exists(args.path_to_ctrl_params):
+                    self.controller.load_parameters(args.path_to_ctrl_params)
+                else:
+                    print(f"Could not find {args.path_to_ctrl_params}")
 
     def save_parameters(self, args):
         if args.train_vision:
@@ -159,3 +163,5 @@ class World_Model:
                 raise NotImplementedError
 
             self.save_parameters(args)
+
+

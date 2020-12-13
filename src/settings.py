@@ -4,6 +4,7 @@ project_dir = os.getcwd()
 data_dir = f"{project_dir}/data"
 param_dir = f"{data_dir}/parameters"
 image_dir = f"{data_dir}/images"
+
 path_to_rnn_params = f"{param_dir}/mdn_rnn.params"
 path_to_vae_params = f"{param_dir}/vae.params"
 path_to_clf_params = f"{param_dir}/clf.params"
