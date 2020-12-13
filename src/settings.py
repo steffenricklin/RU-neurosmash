@@ -8,7 +8,7 @@ image_dir = f"{data_dir}/images"
 path_to_rnn_params = f"{param_dir}/mdn_rnn.params"
 path_to_vae_params = f"{param_dir}/vae.params"
 path_to_clf_params = f"{param_dir}/clf.params"
-path_to_ctrl_params = f"{param_dir}/controller.params"
+path_to_ctrl_params = f"{param_dir}/controller.params.npy"
 
 z_dim = 4
 h_dim = 10

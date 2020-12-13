@@ -10,6 +10,7 @@ class Controller():
         if weights is not None:
             self.weights = weights
         else:
+            print('making new weights')
             self.weights = np.random.normal(0, 1, (n_actions, args.z_dim + args.h_dim))
 
     def action(self, z, h, theta=0):
@@ -42,3 +43,10 @@ class Controller():
         Reshapes the weights to a matrix form
         """
         self.weights = weights.reshape(self.n_actions, int(len(weights)/4))
+
+    def save_parameters(self, path_to_ctrl_params):
+        print('made it here')
+        np.save(path_to_ctrl_params, self.weights, allow_pickle=True)
+
+    def load_parameters(self, path_to_ctrl_params):
+        self.weights = np.load(path_to_ctrl_params)
