@@ -111,6 +111,8 @@ class World_Model:
         """
         char_len_rounds = len(str(r_rounds))
         cumulative_reward = 0
+        step_count = 0
+
         for r in range(r_rounds):
             end, reward, state = self.environment.reset()
 
@@ -130,6 +132,7 @@ class World_Model:
 
                 # Take the step and store the reward
                 end, reward, state = self.environment.step(a)
+                step_count+=1
                 cumulative_reward += reward
 
                 # Get the new hidden states by feeding the RNN the previous state and the action
@@ -140,7 +143,8 @@ class World_Model:
             if prints:
                 print(f'Initial - end: {end}, reward: {reward}, len state: {len(state)}. '
                       f'Round {r + 1:{char_len_rounds}}/{r_rounds}')
-        return cumulative_reward
+        print(f'Reward: {cumulative_reward}. Step count: {step_count}, Weighted reward: {cumulative_reward * 0.999**step_count}')
+        return cumulative_reward * 0.999**step_count
 
     def train(self, args):
         if args.continue_training:

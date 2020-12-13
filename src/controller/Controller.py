@@ -22,7 +22,7 @@ class Controller():
         :param h (vector) h_t: hidden state at timepoint t
         :param theta (float) decision threshold for action
         
-        :return action (int) clipped with tanh()
+        :return action (int) clipped with tandh()
         """
         S = np.append(z, h)
         weights, bias = self.weights[:,:-1], self.weights[:,-1]

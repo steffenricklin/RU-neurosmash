@@ -44,7 +44,7 @@ class NES_trainer(ES_abstract):
         grad = self.grad
 
         reward = np.zeros((n_iter,4))  # score of i) mean weight ii) best performer iii) worst performer iv) sampled population average
-
+        print('using NES trainer for controller')
         tic = time.perf_counter()
         for i in tqdm(range(n_iter)):
             # Reset gradient and Fisher matrix
