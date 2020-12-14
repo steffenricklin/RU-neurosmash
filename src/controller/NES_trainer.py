@@ -30,7 +30,7 @@ class NES_trainer(ES_abstract):
         self.p_theta = lambda theta: stats.multivariate_normal(mean=self.get_mu(theta).flatten(), cov=self.get_Sigma(theta)@self.get_Sigma(theta).T)
 
 
-    def train(self, n_iter, parallel=False):
+    def train(self, n_iter, parallel=False, verbose=True):
         '''
         Natural Evolution Strategy algorithm
         :param n_iter    (int) number of iterations
@@ -77,6 +77,11 @@ class NES_trainer(ES_abstract):
 
             theta += learn_rate * (np.linalg.inv(F) @ grad_J).flatten()
             reward[i] = self.get_reward_stats(theta[:self.dim], fitness)
+            print(f'Mean reward: {reward[i,0]}')
+            print(f'Best reward: {reward[i,1]}')
+            print(f'Worst reward: {reward[i,2]}')
+            print(f'Sampled population reward: {reward[i,3]}')
+
 
         toc = time.perf_counter()
         print(f'Duration of training the controller: {toc - tic:0.4f} seconds')

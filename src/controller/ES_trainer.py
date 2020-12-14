@@ -22,7 +22,7 @@ class ES_trainer(ES_abstract):
         self.weights = np.random.normal(0,1,self.dim)
         self.sigma = 1
 
-    def train(self, n_iter, parallel=False):
+    def train(self, n_iter, parallel=False, verbose=False):
         """
         :param n_iter    (int) number of iterations
         :param parallel (bool) If true, run the Neurosmash environment in parallel
@@ -63,6 +63,11 @@ class ES_trainer(ES_abstract):
             w = np.mean(elite, axis=0)
             sigma = np.sum((elite-w)**2) / elite_size
 
+            if verbose:
+                print(f'Mean reward: {reward[i, 0]}')
+                print(f'Best reward: {reward[i, 1]}')
+                print(f'Worst reward: {reward[i, 2]}')
+                print(f'Sampled population reward: {reward[i, 3]}')
 
         toc = time.perf_counter()
         print(f'Duration of training the controller: {toc - tic:0.4f} seconds')

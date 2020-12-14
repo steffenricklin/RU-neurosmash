@@ -55,6 +55,7 @@ class ES_abstract():
 
         plt.show()
 
+
     def get_reward_stats(self, w, fitness):
         reward = np.zeros(4)
         mean_controller = Controller(self.args)
