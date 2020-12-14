@@ -31,7 +31,7 @@ class World_Model:
 
         self.environment = environment
         self.vision = self.get_vision_model(args)
-        self.rnn = mdn_rnn(input_dim=args.z_dim + args.move_dim, interface_dim=args.h_dim, output_dim=args.z_dim) # TODO Stijn: fix this load params bug
+        self.rnn = mdn_rnn(input_dim=args.z_dim + args.move_dim, interface_dim=args.h_dim, output_dim=args.z_dim)
 
         self.controller = controller
 
@@ -53,7 +53,6 @@ class World_Model:
             vision = Agent_Location_Classifier()
         else:
             vision = ConvVae(args.batch_size, args.z_size)
-            # TODO (optional): implement the option to remove_background as automatic input pre-processing step.
         return vision
 
     def load_parameters(self, args):
@@ -165,7 +164,7 @@ class World_Model:
                     bckgrnd_trainer.train(self.vision)
 
             if args.train_rnn:
-                mdn_rnn_trainer = MDN_RNN_trainer(self.vision, self.environment, args,Neurosmash.Agent()) # TODO Stijn: Give this thing a controller if self has it
+                mdn_rnn_trainer = MDN_RNN_trainer(self.vision, self.environment, args,Neurosmash.Agent())
                 mdn_losses = mdn_rnn_trainer.train(self.rnn)
 
             if args.train_ctrl:

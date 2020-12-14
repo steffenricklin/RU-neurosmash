@@ -19,6 +19,5 @@ def run():
 
 
 if __name__ == '__main__':
-    # TODO everyone: update if more parts work!: currently recommended arguments: --load_model False --timescale 5 --rounds 10 --use_controller False
     args = get_args()
     run()

@@ -1,9 +1,9 @@
 import numpy as np
-np.random.seed(2020)
 from settings import *
+np.random.seed(2020)
 
-class Controller():
 
+class Controller:
     def __init__(self, args, weights=None):
 
         if weights is not None:
@@ -15,8 +15,6 @@ class Controller():
         """
         Get an action from the controller
         Computes a_t = W_c [z_t h_t] + b_t
-        
-        :todo biases are not yet included
 
         :param z (vector) z_t: latent state at timepoint t + hidden state at timepoint t
         :param h (vector) h_t: hidden state at timepoint t
