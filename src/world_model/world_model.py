@@ -103,7 +103,12 @@ class World_Model:
         if args.train_rnn:
             self.rnn.save_parameters(args.path_to_rnn_params)
         if isinstance(self.controller, Controller) and args.train_ctrl:  # if not using a random agent
-            self.controller.save_parameters(args.path_to_ctrl_params)
+            if args.use_NES:
+                NES_path = args.path_to_ctrl_params + "NES"
+                self.controller.save_parameters(NES_path)
+            else:
+                ES_path = args.path_to_ctrl_params+"ES"
+                self.controller.save_parameters(ES_path)
 
     def rollout(self, controller, r_rounds=1, prints=False):
         """

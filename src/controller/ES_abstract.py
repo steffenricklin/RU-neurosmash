@@ -29,9 +29,12 @@ class ES_abstract():
         """
         raise NotImplementedError
 
-    def plot_results(self, reward):
+    def plot_results(self, reward, NES=False):
         plt.figure(figsize=(8, 5))
-        plt.title(f'Cumulative reward of as a function generations')
+        if NES:
+            plt.title('Cumulative reward of Natural Evoltuion Strategies (NES)')
+        else:
+            plt.title(f'Cumulative reward of Evolution Strategies (ES)')
         plt.xlabel('Generation')
         plt.ylabel('Cumulative reward')
 
@@ -45,7 +48,11 @@ class ES_abstract():
         plt.plot(np.arange(1, reward.shape[0] + 1), reward[:, 3], label="Sampled population reward")
 
         plt.legend()
-        plt.savefig('data/images/ControllerResults/controller_training.pdf', dpi=200)
+        if NES:
+            plt.savefig('data/images/ControllerResults/controller_training_NES.png')
+        else:
+            plt.savefig('data/images/ControllerResults/controller_training_ES.png')
+
         plt.show()
 
     def get_reward_stats(self, w, fitness):

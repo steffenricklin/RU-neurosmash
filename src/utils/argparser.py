@@ -39,10 +39,10 @@ def get_args():
 
     parser.add_argument("--use_NES", default=True, type=lambda x: bool(strtobool(str(x))))
     parser.add_argument("--ES_parallel_training", default=False, type=lambda x: bool(strtobool(str(x))))
-    parser.add_argument("--ES_niter", default=10)
-    parser.add_argument("--popsize", default=42)
-    parser.add_argument("--elitesize", default=8)
-    parser.add_argument("--NES_learnrate", default=0.01)
+    parser.add_argument("--ES_niter", default=50)
+    parser.add_argument("--popsize", default=50)
+    parser.add_argument("--elitesize", default=2)
+    parser.add_argument("--NES_learnrate", default=0.001)
     parser.add_argument("--train_split", default=0.9)
     parser.add_argument("--k1", default=1,type = lambda x: int(x))
     parser.add_argument("--k2", default=10,type = lambda x: int(x))
@@ -53,7 +53,7 @@ def get_args():
     parser.add_argument("--vision_lr", default=0.001,type = lambda x: float(x))
 
     parser.add_argument("--rnn_rounds", default=10,type = lambda x: int(x))
-    parser.add_argument("--rnn_lr", default=0.001,type = lambda x: float(x))
+    parser.add_argument("--rnn_lr", default=0.01,type = lambda x: float(x))
 
     # parameter paths
     parser.add_argument("--path_to_clf_params", default=path_to_clf_params)

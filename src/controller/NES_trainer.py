@@ -27,7 +27,7 @@ class NES_trainer(ES_abstract):
         self.theta = np.append(self.weights, sigma_values)
         self.grad = self.grad_log_mvn_pdf
         self.learn_rate = learn_rate
-        self.p_theta = lambda theta: stats.multivariate_normal(mean=self.get_mu(theta).flatten(), cov=self.get_Sigma(theta))
+        self.p_theta = lambda theta: stats.multivariate_normal(mean=self.get_mu(theta).flatten(), cov=self.get_Sigma(theta)@self.get_Sigma(theta).T)
 
 
     def train(self, n_iter, parallel=False):
@@ -49,7 +49,16 @@ class NES_trainer(ES_abstract):
         for i in tqdm(range(n_iter)):
             # Reset gradient and Fisher matrix
             grad_J = np.zeros((self.dim+np.sum(np.arange(self.dim+1)), 1))
-            F = np.zeros((self.dim+np.sum(np.arange(self.dim+1)), 1))
+            F = np.zeros((self.dim+np.sum(np.arange(self.dim+1)), self.dim+np.sum(np.arange(self.dim+1))))
+
+            # Ensure covariance matrix is positive-semidefinite
+            # while not self.is_pos_def(self.get_Sigma(theta)):
+            #     Sigma = self.get_Sigma(theta)
+            #     Sigma += np.eye(self.dim) * 0.1
+            #     theta = self.get_theta_from_cov(Sigma, theta)
+            #     print(f'{i} Matrix not positive semi-definite')
+
+            # Plan B: Sample from A, where A=Sigma @ Sigma.T, therefore
 
             # Specify current pi( | theta) and current gradient
             cur_p_theta = p_theta(theta)
@@ -64,7 +73,7 @@ class NES_trainer(ES_abstract):
                 fitness[j] = self.loss_func(controller)
                 log_der = np.reshape(cur_grad(x), (len(theta), 1))
                 grad_J += fitness[j] * log_der / pop_size
-                F += log_der.T @ log_der / pop_size
+                F += log_der @ log_der.T / pop_size
 
             theta += learn_rate * (np.linalg.inv(F) @ grad_J).flatten()
             reward[i] = self.get_reward_stats(theta[:self.dim], fitness)
@@ -104,4 +113,18 @@ class NES_trainer(ES_abstract):
         Sigma[ind_u] = Sigma_values
         Sigma = Sigma + Sigma.transpose() - np.diag(np.diag(Sigma))
         return Sigma
+
+    def get_theta_from_cov(self, Sigma, theta):
+        """
+        Takes a full symetrical covariance matrix and returns it in array without symmetrical weights
+        :param Sigma: covariance matrix
+        :return: theta: array of all trainable parameters
+        """
+        sigma_values = np.triu(Sigma)
+        ind_u = np.triu_indices(self.dim)
+        sigma_values= sigma_values[ind_u]
+        return np.append(self.get_mu(theta), sigma_values)
+
+    def is_pos_def(self, x):
+        return np.all(np.linalg.eigvals(x) > 0)
 

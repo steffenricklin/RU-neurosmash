@@ -56,7 +56,7 @@ class ES_trainer(ES_abstract):
                 reward[i] = self.get_reward_stats(w, fitness)
 
             # Sort population and take elite            
-            elite_idx  = np.argsort(fitness)[:elite_size]
+            elite_idx  = np.argsort(-fitness)[:elite_size]
             elite      = population[elite_idx]
 
             # Update w and Σ using elite
