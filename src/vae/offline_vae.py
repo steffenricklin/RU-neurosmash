@@ -201,22 +201,6 @@ if __name__ == '__main__':
     run(data, batch_size=1, n_epochs=1)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # def dream():
 #     # the dreaming
 #     # n_samples = 2

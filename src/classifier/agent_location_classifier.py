@@ -1,7 +1,8 @@
 from mxnet import nd, autograd,gluon
 import mxnet.gluon.nn as nn
-
+import utils.background_extractor as BG
 class Agent_Location_Classifier(gluon.Block):
+
     def __init__(self):
         super(Agent_Location_Classifier, self).__init__()
         with self.name_scope():
@@ -21,5 +22,6 @@ class Agent_Location_Classifier(gluon.Block):
         A = self.linear2(A)
         A = self.out(A)
         return A
+
 
 

@@ -14,12 +14,12 @@ class Agent:
         return   3 # random
 
 class Environment:
-    def __init__(self):
-        self.client     = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.ip         = ip
-        self.port       = port
-        self.size       = size
-        self.timescale  = timescale
+    def __init__(self, args):
+        self.client    = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.ip        = args.ip
+        self.port      = args.port
+        self.size      = args.size
+        self.timescale = args.timescale
 
         self.client.connect((ip, port))
 

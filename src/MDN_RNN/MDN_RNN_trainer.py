@@ -1,20 +1,30 @@
 from mxnet import autograd
 from mxnet import gluon, optimizer
+import utils.background_extractor as BE
+import Neurosmash
 from MDN_RNN.mdn_rnn import * 
-
+import numpy as np
+import gc
 
 class MDN_RNN_trainer:
     """
     An object to train and evaluate an MDD-RNN model using Truncated BPTT
     """
 
-    def __init__(self, lr, k1, k2):
-        self.lr = lr
-        self.k1 = k1
-        self.k2 = k2
-        self.retain_graph = k1 < k2
+    def __init__(self, vision, env, args, agent = None):
+        self.args = args
+        self.vision = vision
+        self.env = env
+        if not agent:
+            self.agent = Neurosmash.Agent()
+        else:
+            self.agent = agent
 
-    def train(self, model: mdn_rnn, data, n_epochs=10, print_every=10):
+        # extract background
+        self.extr = BE.Background_Extractor(self.env, self.agent,args)
+        self.background = self.extr.get_background(oned=True)
+
+    def train(self, model: mdn_rnn):
         """
         Trains a given model on data. Applies truncated BPTT
 
@@ -35,63 +45,96 @@ class MDN_RNN_trainer:
         model:(mdn_rnn) trained mdn_rnn object
         negative_log_likelihoods: (nd.array(float)) the training losses
         """
-        optim = optimizer.Adam(learning_rate=self.lr)
 
+        retain_graph = self.args.k1<self.args.k2
+        optim = optimizer.Adam(learning_rate=self.args.rnn_lr)
         trainer = gluon.Trainer(model.collect_params(), optim)
+        # losses = np.zeros((self.args.rnn_rounds, 500))
+        for epo in range(self.args.rnn_rounds):
+            input_data, output_data = self.get_single_rollout()
+            observations = input_data.shape[0]-self.args.k2
+            hidden_states = [(nd.zeros((1, model.RNN.h_dim)),nd.zeros((1, model.RNN.c_dim)))]
+            gc.collect()
+            # epo_loss = nd.zeros(observations)
+            for t in range(observations):
 
-        Z = data[0]
-        A = data[1]
-        ZA = nd.concat(Z,A,dim=2)
+                print(f"Epoch {epo},  timestep {t}")
 
-        assert Z.shape[:2] == A.shape[:2], "Hidden states and actions do not have the same number of episodes or timesteps"
+                # Re-use previously computed states
+                h_cur, c_cur = hidden_states[t]
+                za_t = input_data[t]
+                z_tplusone = output_data[t]
 
-        [n_episodes, n_timesteps_per_episode,_] = Z.shape
+                with autograd.record():
 
-        negative_log_probabilities = nd.zeros((n_epochs, n_episodes, n_timesteps_per_episode-self.k2))
+                    # Model the new prediction, and get updated hidden and output states
+                    pz, h_cur, c_cur = model(za_t[None,:], h_cur, c_cur)
 
-        for epo in range(n_epochs):
-            #TODO implement sampling tactic explained in 'World Models', last paragraph of section A.2, to avoid overfitting
-            if epo > 0 & epo&print_every == 0:
-                print(f"epoch {epo}")
-            for epi in range(n_episodes):
+                    # Store the hidden states to re-use them later
+                    hidden_states.append((h_cur.detach(), c_cur.detach()))
 
-                states = [(nd.zeros((1, model.RNN.h_dim)),nd.zeros((1, model.RNN.c_dim)))]
+                    # Take k2-1 more steps
+                    for j in range(self.args.k2-1):
 
-                for t in range(n_timesteps_per_episode-self.k2):
+                        # Get new input and target
+                        za_t = input_data[t+j+1]
+                        z_tplusone = output_data[t+j+1]
 
-                    print(f"Epoch {epo}, episode {epi}, timestep {t}")
-
-                    # Re-use previously computed states
-                    h_cur, c_cur = states[t]
-                    za_t = ZA[epi,t]
-                    z_tplusone = Z[epi,t+1]
-
-                    with autograd.record():
-
-                        # Model the new prediction, and get updated hidden and output states
+                        # Make new prediction
                         pz, h_cur, c_cur = model(za_t[None,:], h_cur, c_cur)
 
-                        # Store the hidden states to re-use them later
-                        states.append((h_cur.detach(), c_cur.detach()))
+                    neg_log_prob = -pz.log_prob(z_tplusone)
 
-                        # Take k2-1 more steps
-                        for j in range(self.k2-1):
+                # Do backprop on the current output
+                neg_log_prob.backward(retain_graph = retain_graph)
 
-                            # Get new input and target
-                            za_t = ZA[epi, t+j+1]
-                            z_tplusone = Z[epi, t+j+2]
+                trainer.step(1, ignore_stale_grad=False)
+                # epo_loss[t] = neg_log_prob.detach().asnumpy()
+            # losses[epo,:observations] = epo_loss[:observations].asnumpy()
 
-                            # Make new prediction
-                            pz, h_cur, c_cur = model(za_t[None,:], h_cur, c_cur)
 
-                        neg_log_prob = -pz.log_prob(z_tplusone)
+    def get_single_rollout(self):
+        """
+        Returns a bunch of hidden states, paired with the actions took at that time
+        :param n_init_rounds:
+        :return:
+        """
+        max_samples = 500
+        input_buffer = nd.zeros((max_samples, self.args.z_dim+self.args.move_dim))
+        output_buffer = nd.zeros((max_samples, self.args.z_dim))
 
-                    # Do backprop on the current output
-                    neg_log_prob.backward(retain_graph = False)
+        buffered_samples = 0
+        eye = nd.eye(self.args.move_dim)
 
-                    trainer.step(1, ignore_stale_grad=False)
+        # Prepare environment
+        end, reward, state = self.env.reset()
+        state_mx = self.extr.clean_and_reshape(state)/255
 
-                    # # Store the mean of the loss
-                    # negative_log_probabilities[epo,epi,t] = neg_log_probs.detach().mean().asnumpy()
+        while end == 0:
+            # Get latent representation
+            latent = self.vision(state_mx)
 
-        # return negative_log_probabilities
+            # Store latent as output from previous step
+            if buffered_samples > 0:
+                output_buffer[buffered_samples-1] = latent
+
+            # Get action by random int
+            action = np.random.randint(0,self.args.move_dim)
+            action_onehot = eye[None,action]
+
+            # Concatenate latent and action
+            sample = nd.concatenate([latent,action_onehot], 1)
+
+            # Store result in buffer
+            input_buffer[buffered_samples] = sample
+            buffered_samples += 1
+
+            # Break if we have enough
+            if buffered_samples >= max_samples:
+                break
+
+            # Go to next state
+            end, _, state = self.env.step(action)
+            state_mx = self.extr.clean_and_reshape(state)/255
+
+        return input_buffer[:buffered_samples-1], output_buffer[:buffered_samples-1]

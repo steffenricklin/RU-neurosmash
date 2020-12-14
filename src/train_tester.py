@@ -1,5 +1,5 @@
 import vae.vae_online_trainer_with_background_removal as bgt
-from classifier.classifier_test import Classifier_Trainer
+from classifier.classifier_trainer import Classifier_Trainer
 from settings import *
 from classifier.agent_location_classifier import *
 
