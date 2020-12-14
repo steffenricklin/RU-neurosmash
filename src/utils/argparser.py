@@ -19,9 +19,9 @@ def get_args():
     parser.add_argument("--train_rnn", default=False, type=lambda x: bool(strtobool(str(x))))
     parser.add_argument("--train_ctrl", default=True, type=lambda x: bool(strtobool(str(x))))
 
-    parser.add_argument("--z_dim", default=z_dim, type=lambda x: int(x))
-    parser.add_argument("--h_dim", default=h_dim, type=lambda x: int(x))
-    parser.add_argument("--move_dim", default=move_dim, type=lambda x: int(x))
+    parser.add_argument("--z_dim", default=z_dim, type = lambda x: int(x))
+    parser.add_argument("--h_dim", default=h_dim, type = lambda x: int(x))
+    parser.add_argument("--move_dim", default=move_dim, type = lambda x: int(x))
     parser.add_argument("--ip", default=ip,
                         help="Ip address that the TCP/IP interface listens to (127.0.0.1 by default)")
     parser.add_argument("--port", default=port,
@@ -33,27 +33,27 @@ def get_args():
     parser.add_argument("--state_dim", default=state_dim)
 
     parser.add_argument("--device", default="gpu", help="cpu | gpu")
-    parser.add_argument("--batch_size", default=40, type=lambda x: int(x))
-    parser.add_argument("--learning_rate", default=1e-3, type=lambda x: float(x))
-    parser.add_argument("--n_epochs", default=15, type=lambda x: int(x))
+    parser.add_argument("--batch_size", default=40)
+    parser.add_argument("--learning_rate", default=1e-3)
+    parser.add_argument("--n_epochs", default=15)
 
     parser.add_argument("--use_NES", default=True, type=lambda x: bool(strtobool(str(x))))
     parser.add_argument("--ES_parallel_training", default=False, type=lambda x: bool(strtobool(str(x))))
-    parser.add_argument("--ES_niter", default=10, type=lambda x: int(x))
-    parser.add_argument("--popsize", default=42, type=lambda x: int(x))
-    parser.add_argument("--elitesize", default=8, type=lambda x: int(x))
-    parser.add_argument("--NES_learnrate", default=0.01, type=lambda x: int(x))
-    parser.add_argument("--train_split", default=0.9, type=lambda x: float(x))
-    parser.add_argument("--k1", default=1, type=lambda x: int(x))
-    parser.add_argument("--k2", default=10, type=lambda x: int(x))
+    parser.add_argument("--ES_niter", default=25)
+    parser.add_argument("--popsize", default=25)
+    parser.add_argument("--elitesize", default=2)
+    parser.add_argument("--NES_learnrate", default=0.008)
+    parser.add_argument("--train_split", default=0.9)
+    parser.add_argument("--k1", default=1,type = lambda x: int(x))
+    parser.add_argument("--k2", default=10,type = lambda x: int(x))
 
-    parser.add_argument("--vision_init_rounds", default=5, type=lambda x: int(x))
-    parser.add_argument("--vision_epochs", default=10, type=lambda x: int(x))
-    parser.add_argument("--vision_batch_size", default=1, type=lambda x: int(x))
-    parser.add_argument("--vision_lr", default=0.001, type=lambda x: float(x))
+    parser.add_argument("--vision_init_rounds", default=5,type = lambda x: int(x))
+    parser.add_argument("--vision_epochs", default=10,type = lambda x: int(x))
+    parser.add_argument("--vision_batch_size", default=1,type = lambda x: int(x))
+    parser.add_argument("--vision_lr", default=0.001,type = lambda x: float(x))
 
-    parser.add_argument("--rnn_rounds", default=10, type=lambda x: int(x))
-    parser.add_argument("--rnn_lr", default=0.001, type=lambda x: float(x))
+    parser.add_argument("--rnn_rounds", default=10,type = lambda x: int(x))
+    parser.add_argument("--rnn_lr", default=0.01,type = lambda x: float(x))
 
     # parameter paths
     parser.add_argument("--path_to_clf_params", default=path_to_clf_params)

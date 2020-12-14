@@ -103,7 +103,12 @@ class World_Model:
         if args.train_rnn:
             self.rnn.save_parameters(args.path_to_rnn_params)
         if isinstance(self.controller, Controller) and args.train_ctrl:  # if not using a random agent
-            self.controller.save_parameters(args.path_to_ctrl_params)
+            if args.use_NES:
+                NES_path = args.path_to_ctrl_params + "NES"
+                self.controller.save_parameters(NES_path)
+            else:
+                ES_path = args.path_to_ctrl_params+"ES"
+                self.controller.save_parameters(ES_path)
 
     def rollout(self, controller, r_rounds=1, prints=False):
         """
@@ -121,7 +126,7 @@ class World_Model:
             eye = nd.eye(self.args.move_dim)
             # Initialize hidden states for RNN
             h,c = (nd.zeros((1, self.rnn.RNN.h_dim)),nd.zeros((1, self.rnn.RNN.c_dim)))
-            while end == 0:
+            while end == 0 and step_count < 4000:
                 # Get latent representation from LSTM
                 z = self.vision(self.extr.clean_and_reshape(state)/255)
 
@@ -146,6 +151,7 @@ class World_Model:
                       f'Round {r + 1:{char_len_rounds}}/{r_rounds}')
         step_count = int(step_count/r_rounds)
         print(f'Reward: {cumulative_reward}. Step count: {step_count}, Weighted reward: {cumulative_reward * 0.999**step_count}')
+        step_count = int(step_count/r_rounds)
         return cumulative_reward * 0.999**step_count
 
     def train(self, args):
@@ -164,7 +170,8 @@ class World_Model:
 
             if args.train_ctrl:
                 if args.use_NES:
-                    es_trainer = NES_trainer(self.rollout, args.popsize, learn_rate=args.NES_learnrate, args=args)
+                    theta_init = np.load(f"data/parameters/controller.params.npy"+"NES3.npy")
+                    es_trainer = NES_trainer(self.rollout, args.popsize, learn_rate=args.NES_learnrate, args=args, theta_init=theta_init)
                 else:
                     es_trainer = ES_trainer(self.rollout, args.popsize, args.elitesize, args)
                 controller, reward = es_trainer.train(n_iter=args.ES_niter, parallel=args.ES_parallel_training)
