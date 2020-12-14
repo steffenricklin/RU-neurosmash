@@ -144,6 +144,7 @@ class World_Model:
             if prints:
                 print(f'Initial - end: {end}, reward: {reward}, len state: {len(state)}. '
                       f'Round {r + 1:{char_len_rounds}}/{r_rounds}')
+        step_count = int(step_count/r_rounds)
         print(f'Reward: {cumulative_reward}. Step count: {step_count}, Weighted reward: {cumulative_reward * 0.999**step_count}')
         return cumulative_reward * 0.999**step_count
 

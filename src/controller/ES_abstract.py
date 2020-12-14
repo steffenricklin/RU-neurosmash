@@ -52,7 +52,7 @@ class ES_abstract():
         reward = np.zeros(4)
         mean_controller = Controller(self.args)
         mean_controller.set_weight_array(w)
-        reward[0] = self.loss_func(mean_controller)  # First entry is of mean weights, after that of pop. members
+        reward[0] = self.loss_func(mean_controller, r_rounds=2)  # First entry is of mean weights, after that of pop. members
         reward[1] = np.max(fitness)  # best performer
         reward[2] = np.min(fitness)  # worst performer
         reward[3] = np.mean(fitness)  # sampled population mean

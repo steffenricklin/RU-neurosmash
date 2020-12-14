@@ -52,7 +52,7 @@ class ES_trainer(ES_abstract):
             else:
                 fitness = np.zeros(pop_size)
                 for j in tqdm(range(pop_size)):
-                    fitness[j] = self.loss_func(controllers[j])
+                    fitness[j] = self.loss_func(controllers[j], r_rounds=2)
                 reward[i] = self.get_reward_stats(w, fitness)
 
             # Sort population and take elite            

@@ -62,7 +62,7 @@ def get_args():
     parser.add_argument("--path_to_ctrl_params", default=path_to_ctrl_params)
 
     # rollout simulations
-    parser.add_argument("--rounds", default=5, type=lambda x: int(x),
+    parser.add_argument("--rounds", default=2, type=lambda x: int(x),
                         help="number of rounds simulated with rollout")
 
     args = parser.parse_args()
