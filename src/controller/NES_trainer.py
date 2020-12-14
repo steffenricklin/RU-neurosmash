@@ -70,7 +70,7 @@ class NES_trainer(ES_abstract):
                 x = np.reshape(cur_p_theta.rvs(), (self.dim, 1))
                 controller = Controller(self.args)
                 controller.set_weight_array(x)
-                fitness[j] = self.loss_func(controller)
+                fitness[j] = self.loss_func(controller, r_rounds=2)
                 log_der = np.reshape(cur_grad(x), (len(theta), 1))
                 grad_J += fitness[j] * log_der / pop_size
                 F += log_der @ log_der.T / pop_size
@@ -81,6 +81,9 @@ class NES_trainer(ES_abstract):
             print(f'Best reward: {reward[i,1]}')
             print(f'Worst reward: {reward[i,2]}')
             print(f'Sampled population reward: {reward[i,3]}')
+
+            # Save parameters
+            np.save(self.args.path_to_ctrl_params+f"NES{i}", theta)
 
 
         toc = time.perf_counter()

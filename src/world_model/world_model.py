@@ -126,7 +126,7 @@ class World_Model:
             eye = nd.eye(self.args.move_dim)
             # Initialize hidden states for RNN
             h,c = (nd.zeros((1, self.rnn.RNN.h_dim)),nd.zeros((1, self.rnn.RNN.c_dim)))
-            while end == 0:
+            while end == 0 and step_count < 4000:
                 # Get latent representation from LSTM
                 z = self.vision(self.extr.clean_and_reshape(state)/255)
 
@@ -150,6 +150,7 @@ class World_Model:
                 print(f'Initial - end: {end}, reward: {reward}, len state: {len(state)}. '
                       f'Round {r + 1:{char_len_rounds}}/{r_rounds}')
         print(f'Reward: {cumulative_reward}. Step count: {step_count}, Weighted reward: {cumulative_reward * 0.999**step_count}')
+        step_count = int(step_count/r_rounds)
         return cumulative_reward * 0.999**step_count
 
     def train(self, args):
