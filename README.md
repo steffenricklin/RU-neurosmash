@@ -6,4 +6,4 @@ To make the world model more biologically plausible, we used a natural - instead
 We found that neither method performs very well. Reasons as to why this could be the case are outlined in the discussion. 
 ![](AgentRecordingNaturalWorldModels.gif)
 
-![alt text](ES_himmelblau.png?raw=true)
+![Test Image 1](ES_himmelblau.png)
