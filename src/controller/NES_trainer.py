@@ -10,7 +10,7 @@ from scipy import stats
 
 class NES_trainer(ES_abstract):
 
-    def __init__(self, loss_function, pop_size, learn_rate, args):
+    def __init__(self, loss_function, pop_size, learn_rate, args, theta_init=None):
         """
         Natural Evolution Strategy algorithm
         :param loss_function (function) rollout of the Neurosmash environment, function to be optimized
@@ -21,10 +21,16 @@ class NES_trainer(ES_abstract):
         :param args
         """
         super().__init__(loss_function, pop_size, args)
-        self.weights = np.random.normal(0, 1, self.dim) # weights = mu
-        self.cov_matrix = np.eye(self.dim)
-        sigma_values = np.triu(self.cov_matrix)[np.triu_indices(self.dim)]
-        self.theta = np.append(self.weights, sigma_values)
+        if theta_init is None:
+            self.weights = np.random.normal(0, 1, self.dim) # weights = mu
+            self.cov_matrix = np.eye(self.dim)
+            sigma_values = np.triu(self.cov_matrix)[np.triu_indices(self.dim)]
+            self.theta = np.append(self.weights, sigma_values)
+        else:
+            print(theta_init)
+            self.theta = theta_init
+            self.weights = self.get_mu(theta_init)
+            self.cov_matrix = self.get_Sigma(theta_init)
         self.grad = self.grad_log_mvn_pdf
         self.learn_rate = learn_rate
         self.p_theta = lambda theta: stats.multivariate_normal(mean=self.get_mu(theta).flatten(), cov=self.get_Sigma(theta)@self.get_Sigma(theta).T)

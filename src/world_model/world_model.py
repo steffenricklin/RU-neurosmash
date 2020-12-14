@@ -169,7 +169,8 @@ class World_Model:
 
             if args.train_ctrl:
                 if args.use_NES:
-                    es_trainer = NES_trainer(self.rollout, args.popsize, learn_rate=args.NES_learnrate, args=args)
+                    theta_init = np.load(f"data/parameters/controller.params.npy"+"NES3.npy")
+                    es_trainer = NES_trainer(self.rollout, args.popsize, learn_rate=args.NES_learnrate, args=args, theta_init=theta_init)
                 else:
                     es_trainer = ES_trainer(self.rollout, args.popsize, args.elitesize, args)
                 controller, reward = es_trainer.train(n_iter=args.ES_niter, parallel=args.ES_parallel_training)
