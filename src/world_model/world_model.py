@@ -123,7 +123,7 @@ class World_Model:
             h,c = (nd.zeros((1, self.rnn.RNN.h_dim)),nd.zeros((1, self.rnn.RNN.c_dim)))
             while end == 0:
                 # Get latent representation from LSTM
-                z = self.vision(self.extr.clean_and_reshape(state, self.args.size))
+                z = self.vision(self.extr.clean_and_reshape(state)/255)
 
                 # Compute the best step with the controller
                 if isinstance(controller, Controller):

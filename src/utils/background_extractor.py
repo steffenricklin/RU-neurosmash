@@ -45,9 +45,25 @@ class Background_Extractor:
         else:
             return pickle.load(open(target_filename,"rb"))
 
-    def clean_and_reshape(self, state, size):
-        bg = self.get_background(oned = True)
-        cleanstate = np.where(state == bg, 10, state)
-        return nd.array(np.reshape(cleanstate, (1,3,self.args.size, self.args.size)))
-
+    def clean_and_reshape(self, state, oned=False):
+        """
+        Receives a 1-d list with pixel values, and returns an mx tensor reshaped as an image, where all the pixels that are background are set to 0
+        :param state:
+        :param oned:
+        :return:
+        """
+        bg = self.get_background(oned = False)
+        state_rs = np.reshape(state, (self.args.size, self.args.size, 3))
+        def func(x):
+            redequal = x[:, :, 0] == bg[:, :, 0]
+            greenequal = x[:, :, 1] ==bg[:, :, 1]
+            blueequal = x[:, :, 2] == bg[:, :, 2]
+            return np.repeat((redequal & greenequal & blueequal)[:,:,None], 3,2)
+        im = np.where(func(state_rs),0, state_rs)
+        flat = np.reshape(im,(-1,))
+        if oned:
+            return nd.array(flat)
+        else:
+            tensor = np.reshape(flat, (1, 3,self.args.size, self.args.size))
+            return nd.array(tensor)
 
